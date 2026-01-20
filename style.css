@@ -1,131 +1,51 @@
 :root {
     --primary: #2d6a4f;
     --primary-dark: #1b4332;
-    --accent: #95d5b2;
     --bg: #f8f9fa;
-    --text: #212529;
-    --text-light: #6c757d;
     --white: #ffffff;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { background: var(--bg); padding-bottom: 90px; }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    padding-bottom: 70px; /* Espaço para a navegação inferior */
-}
+header { background: var(--primary-dark); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.reset-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-header {
-    background-color: var(--primary-dark);
-    color: var(--white);
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+.search-input { width: calc(100% - 30px); margin: 15px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; }
 
-.app-container {
-    padding: 1rem;
-}
+/* Botão Flutuante (FAB) */
+.fab { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; background: var(--primary); border-radius: 50%; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-/* Cards de Espécies */
-.species-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
+/* Sidebar */
+.sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: white; z-index: 1001; transition: 0.3s; padding: 20px; overflow-y: auto; }
+.sidebar.open { right: 0; }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1000; }
+.overlay.active { display: block; }
 
-.card {
-    background: var(--white);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    border: 1px solid #e9ecef;
-}
+.filter-group { margin-bottom: 20px; }
+.filter-btn { margin: 3px; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--primary); background: white; font-size: 0.75rem; cursor: pointer; }
+.filter-btn.active { background: var(--primary); color: white; }
 
-.card-body {
-    padding: 1rem;
-}
+/* Cards */
+.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 15px; }
+.card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #eee; }
+.card img { width: 100%; height: 180px; object-fit: cover; }
+.card-body { padding: 15px; }
+.pop-name { font-weight: bold; font-size: 1.1rem; color: var(--primary-dark); }
+.sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 10px; }
 
-.pop-name {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-}
+/* Botões */
+.btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; }
+.btn-camera { display: block; text-align: center; background: #e9ecef; border: 2px dashed var(--primary); padding: 20px; border-radius: 8px; cursor: pointer; color: var(--primary-dark); font-weight: bold; }
+.btn-export { width: 100%; padding: 12px; background: #34495e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-.sci-name {
-    font-style: italic;
-    color: var(--text-light);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
+/* Navigation */
+.main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 100; }
+.nav-btn { flex: 1; padding: 20px; border: none; background: none; font-weight: bold; color: #7f8c8d; cursor: pointer; }
+.nav-btn.active { color: var(--primary); border-top: 4px solid var(--primary); }
 
-/* Botão da Câmera Personalizado */
-.btn-camera {
-    display: block;
-    width: 100%;
-    background: #e9ecef;
-    border: 2px dashed var(--primary);
-    color: var(--primary-dark);
-    padding: 1.5rem;
-    text-align: center;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    margin: 1rem 0;
-}
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-content { background: white; padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; }
+textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.8rem 1.2rem;
-    border-radius: 8px;
-    width: 100%;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* Navegação Inferior */
-.main-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--white);
-    display: flex;
-    border-top: 1px solid #dee2e6;
-    z-index: 1000;
-}
-
-.nav-btn {
-    flex: 1;
-    border: none;
-    background: none;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
-
-.nav-btn.active {
-    color: var(--primary);
-    border-top: 3px solid var(--primary);
-}
-
-/* Esconder seções */
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
