@@ -1,16 +1,11 @@
 import { speciesData as part1 } from './db.js';
 import { speciesDataPart2 as part2 } from './db_part2.js';
-import { initDB, saveObservation, getAllObservations } from './collection.js';
+import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
 const speciesData = [...part1, ...part2];
 
 let activeFilters = {
-    type: [],
-    leafArrangement: [],
-    leafComposition: [],
-    leafMargin: [],
-    exudate: [],
-    spines: []
+    type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: []
 };
 
 async function init() {
@@ -18,6 +13,14 @@ async function init() {
     renderFilters();
     renderSpecies(speciesData);
     setupEventListeners();
+}
+
+// Corrigido: Reset sem recarregar a página (Funciona Offline)
+function resetFilters() {
+    activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [] };
+    document.getElementById('search-input').value = '';
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    applyFilters();
 }
 
 function renderFilters() {
@@ -35,14 +38,13 @@ function renderFilters() {
     filterConfig.forEach(conf => {
         const group = document.createElement('div');
         group.className = 'filter-group';
-        group.innerHTML = `<p style="font-weight:bold; font-size:0.85rem; margin-bottom:5px; color:#2c3e50;">${conf.label}</p>`;
+        group.innerHTML = `<p style="font-weight:bold; font-size:0.85rem; margin-bottom:5px;">${conf.label}</p>`;
 
         const values = [...new Set(speciesData.map(s => String(s[conf.key])))].sort();
         values.forEach(val => {
             const btn = document.createElement('button');
             btn.className = 'filter-btn';
             btn.textContent = val === 'true' ? 'Sim' : val === 'false' ? 'Não' : val;
-
             btn.onclick = () => {
                 const actualVal = val === 'true' ? true : val === 'false' ? false : val;
                 if (activeFilters[conf.key].includes(actualVal)) {
@@ -65,7 +67,6 @@ function applyFilters() {
     const filtered = speciesData.filter(sp => {
         const matchesText = sp.scientificName.toLowerCase().includes(query) ||
                             sp.popularNames.some(p => p.toLowerCase().includes(query));
-
         const matchesFilters = Object.keys(activeFilters).every(key => {
             if (activeFilters[key].length === 0) return true;
             return activeFilters[key].includes(sp[key]);
@@ -84,78 +85,71 @@ function renderSpecies(list) {
         card.className = 'card';
         card.innerHTML = `
             <div class="card-body">
-                <p style="color:var(--primary); font-weight:bold; font-size:0.7rem; text-transform:uppercase;">${sp.family}</p>
+                <p style="color:var(--primary); font-weight:bold; font-size:0.7rem;">${sp.family}</p>
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
-                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
+                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
             </div>
         `;
         grid.appendChild(card);
     });
 }
 
-// EXPORTAR PARA CSV (EXCEL)
-async function exportToCSV() {
-    const data = await getAllObservations();
-    if (data.length === 0) return alert('Nenhum dado para exportar.');
-
-    let csvContent = "\uFEFF"; // Garante acentuação correta no Excel
-    csvContent += "ID;Nome Popular;Nome Cientifico;Anotacoes;Data;Hora\n";
-
-    data.forEach(obs => {
-        const dateObj = new Date(obs.timestamp);
-        const row = [
-            obs.speciesId,
-            obs.speciesName,
-            obs.scientificName,
-            obs.note.replace(/;/g, ','), // Evita quebrar colunas
-            dateObj.toLocaleDateString(),
-            dateObj.toLocaleTimeString()
-        ];
-        csvContent += row.join(";") + "\n";
-    });
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `DendroKey_Export_${new Date().toLocaleDateString()}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
+// Meu Acervo com Características Automáticas e Botão Deletar
 async function renderCollection() {
     const grid = document.getElementById('collection-grid');
     const observations = await getAllObservations();
     grid.innerHTML = '';
 
     if (observations.length === 0) {
-        grid.innerHTML = '<p style="padding:20px; text-align:center; color:#95a5a6;">Seu caderno de campo está vazio.</p>';
+        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Acervo vazio.</p>';
         return;
     }
 
     observations.forEach(obs => {
+        // Busca os dados botânicos originais da espécie pelo ID
+        const info = speciesData.find(s => s.id === obs.speciesId);
         const card = document.createElement('div');
         card.className = 'card';
-        let imgTag = '<div style="height:180px; background:#ddd; display:flex; align-items:center; justify-content:center; color:#7f8c8d;">Sem Foto</div>';
+
+        let imgTag = '<div style="height:180px; background:#ddd; display:flex; align-items:center; justify-content:center;">Sem Foto</div>';
         if (obs.photo) {
             const imgUrl = URL.createObjectURL(obs.photo);
             imgTag = `<img src="${imgUrl}">`;
         }
+
         card.innerHTML = `
             ${imgTag}
             <div class="card-body">
-                <div class="pop-name">${obs.speciesName}</div>
-                <div class="sci-name">${obs.scientificName}</div>
-                <div style="background:#f1f1f1; padding:8px; border-radius:5px; margin:5px 0; font-size:0.85rem;">${obs.note || 'Sem notas.'}</div>
-                <p style="font-size:0.7rem; color:#95a5a6;">📅 ${new Date(obs.timestamp).toLocaleString()}</p>
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <div>
+                        <div class="pop-name">${obs.speciesName}</div>
+                        <div class="sci-name">${obs.scientificName}</div>
+                    </div>
+                    <button class="btn-delete" onclick="window.confirmDelete(${obs.id})">🗑️</button>
+                </div>
+
+                <div class="traits-box">
+                    <span><b>Hábito:</b> ${info.type}</span>
+                    <span><b>Folha:</b> ${info.leafComposition}</span>
+                    <span><b>Arranjo:</b> ${info.leafArrangement}</span>
+                    <span><b>Exsudato:</b> ${info.exudate}</span>
+                </div>
+
+                <div class="note-box">${obs.note || 'Sem notas.'}</div>
+                <p style="font-size:0.65rem; color:#999; margin-top:8px;">📅 ${new Date(obs.timestamp).toLocaleString()}</p>
             </div>
         `;
         grid.appendChild(card);
     });
 }
+
+window.confirmDelete = async (id) => {
+    if (confirm('Deseja excluir este registro permanentemente?')) {
+        await deleteObservation(id);
+        renderCollection();
+    }
+};
 
 function setupEventListeners() {
     const fab = document.getElementById('fab-filter');
@@ -165,15 +159,14 @@ function setupEventListeners() {
     fab.onclick = () => { sidebar.classList.add('open'); overlay.classList.add('active'); };
     overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
     document.getElementById('close-filter').onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
-    document.getElementById('btn-export').onclick = exportToCSV;
+    document.getElementById('reset-btn').onclick = resetFilters;
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             btn.classList.add('active');
-            const target = document.getElementById(`view-${btn.dataset.target}`);
-            target.classList.remove('hidden');
+            document.getElementById(`view-${btn.dataset.target}`).classList.remove('hidden');
             if (btn.dataset.target === 'collection') renderCollection();
         };
     });
@@ -193,27 +186,20 @@ function setupEventListeners() {
             note: note
         });
 
-        alert('Salvo no Caderno de Campo!');
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        document.getElementById('photo-preview-text').textContent = "Nenhuma foto selecionada";
+        alert('Registro salvo!');
     };
 
     document.getElementById('photo-input').onchange = (e) => {
-        const text = document.getElementById('photo-preview-text');
-        if (e.target.files.length > 0) {
-            text.textContent = "✅ Foto capturada: " + e.target.files[0].name;
-            text.style.color = "green";
-        }
+        document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto anexada" : "Nenhuma foto";
     };
-
-    document.getElementById('reset-btn').onclick = () => location.reload();
 }
 
 window.openModal = (id) => {
     const sp = speciesData.find(s => s.id === id);
     document.getElementById('modal-species-id').value = id;
-    document.getElementById('modal-species-name').textContent = "Registrar: " + sp.popularNames[0];
+    document.getElementById('modal-species-name').textContent = sp.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
 };
 
