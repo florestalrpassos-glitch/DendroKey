@@ -1,0 +1,131 @@
+:root {
+    --primary: #2d6a4f;
+    --primary-dark: #1b4332;
+    --accent: #95d5b2;
+    --bg: #f8f9fa;
+    --text: #212529;
+    --text-light: #6c757d;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    padding-bottom: 70px; /* Espaço para a navegação inferior */
+}
+
+header {
+    background-color: var(--primary-dark);
+    color: var(--white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-container {
+    padding: 1rem;
+}
+
+/* Cards de Espécies */
+.species-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.pop-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.sci-name {
+    font-style: italic;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Botão da Câmera Personalizado */
+.btn-camera {
+    display: block;
+    width: 100%;
+    background: #e9ecef;
+    border: 2px dashed var(--primary);
+    color: var(--primary-dark);
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Navegação Inferior */
+.main-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    display: flex;
+    border-top: 1px solid #dee2e6;
+    z-index: 1000;
+}
+
+.nav-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.nav-btn.active {
+    color: var(--primary);
+    border-top: 3px solid var(--primary);
+}
+
+/* Esconder seções */
+.hidden {
+    display: none !important;
+}

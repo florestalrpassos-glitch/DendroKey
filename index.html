@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DendroKey - Identificação Botânica</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1b4332">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span>🌿</span>
+            <span>DendroKey</span>
+        </div>
+        <button id="reset-btn" class="reset-btn">Limpar Filtros</button>
+    </header>
+
+    <div class="app-container">
+        <nav class="main-nav">
+            <button class="nav-btn active" data-target="home">
+                <span>🔍</span> Identificar
+            </button>
+            <button class="nav-btn" data-target="collection">
+                <span>📓</span> Meu Acervo
+            </button>
+        </nav>
+
+        <div id="view-home" class="view-section active">
+            <aside class="filters">
+                <div style="padding: 1rem 0;">
+                    <input type="text" id="search-input" placeholder="Buscar por nome popular ou científico..." class="search-input" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+                </div>
+                <div id="filter-container">
+                    </div>
+            </aside>
+
+            <main class="results">
+                <div class="results-header" style="margin: 1rem 0; display: flex; justify-content: space-between;">
+                    <h3 style="color: var(--primary-dark)">Resultados</h3>
+                    <span id="count-badge" class="count-badge">Carregando...</span>
+                </div>
+                <div id="results-grid" class="species-grid">
+                    </div>
+            </main>
+        </div>
+
+        <div id="view-collection" class="view-section hidden">
+            <div class="collection-header">
+                <h2>Meu Caderno de Campo</h2>
+                <p>Observações salvas localmente no dispositivo.</p>
+            </div>
+            <div id="collection-grid" class="species-grid">
+                </div>
+        </div>
+    </div>
+
+    <div id="add-modal" class="modal hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+        <div class="modal-content" style="background: white; padding: 1.5rem; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 id="modal-species-name">Registrar Espécie</h3>
+                <span class="close-modal" style="font-size: 1.5rem; cursor: pointer;">&times;</span>
+            </div>
+
+            <form id="add-form">
+                <input type="hidden" id="modal-species-id">
+
+                <div class="form-group">
+                    <label style="margin-bottom:0.5rem; display:block; font-weight: bold;">Foto da Árvore/Folha</label>
+                    <label for="photo-input" class="btn-camera">
+                        <span>📷</span> Abrir Câmera do Celular
+                    </label>
+                    <input type="file" id="photo-input" accept="image/jpeg, image/png" capture="environment" style="display: none;">
+                    <div id="photo-preview-text" style="font-size:0.8rem; color:#666; margin-top:0.5rem; text-align: center;">Nenhuma foto selecionada</div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label style="display: block; font-weight: bold;">Anotações de Campo</label>
+                    <textarea id="note-input" rows="3" placeholder="Ex: Indivíduo com 15m, DAP estimado, presença de epífitas..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin: 1rem 0;">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="gps-input" checked>
+                        <span>Salvar Coordenadas (GPS)</span>
+                    </label>
+                    <div id="gps-status" style="font-size: 0.8rem; color: #666; margin-left: 25px;"></div>
+                </div>
+
+                <button type="submit" class="btn-primary">Salvar no Meu Acervo</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
