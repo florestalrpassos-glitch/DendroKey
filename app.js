@@ -1,8 +1,9 @@
 import { speciesData as part1 } from './db.js';
 import { speciesDataPart2 as part2 } from './db_part2.js';
+import { speciesDataPart3 as part3 } from './db_part3.js';
 import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
-const speciesData = [...part1, ...part2];
+const speciesData = [...part1, ...part2, ...part3];
 
 let activeFilters = {
     type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: []
@@ -13,14 +14,6 @@ async function init() {
     renderFilters();
     renderSpecies(speciesData);
     setupEventListeners();
-}
-
-// Corrigido: Reset sem recarregar a página (Funciona Offline)
-function resetFilters() {
-    activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [] };
-    document.getElementById('search-input').value = '';
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    applyFilters();
 }
 
 function renderFilters() {
@@ -63,14 +56,18 @@ function renderFilters() {
 }
 
 function applyFilters() {
-    const query = document.getElementById('search-input').value.toLowerCase();
+    const searchInput = document.getElementById('search-input');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
     const filtered = speciesData.filter(sp => {
         const matchesText = sp.scientificName.toLowerCase().includes(query) ||
                             sp.popularNames.some(p => p.toLowerCase().includes(query));
+
         const matchesFilters = Object.keys(activeFilters).every(key => {
             if (activeFilters[key].length === 0) return true;
             return activeFilters[key].includes(sp[key]);
         });
+
         return matchesText && matchesFilters;
     });
     renderSpecies(filtered);
@@ -85,7 +82,7 @@ function renderSpecies(list) {
         card.className = 'card';
         card.innerHTML = `
             <div class="card-body">
-                <p style="color:var(--primary); font-weight:bold; font-size:0.7rem;">${sp.family}</p>
+                <p style="color:var(--primary); font-weight:bold; font-size:0.7rem; text-transform:uppercase;">${sp.family}</p>
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
                 <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
@@ -95,7 +92,33 @@ function renderSpecies(list) {
     });
 }
 
-// Meu Acervo com Características Automáticas e Botão Deletar
+async function exportToCSV() {
+    const data = await getAllObservations();
+    if (data.length === 0) return alert('Acervo vazio.');
+
+    let csvContent = "\uFEFF";
+    csvContent += "ID;Nome Popular;Nome Cientifico;Habito;Folha;Arranjo;Exsudato;Notas;Data\n";
+
+    data.forEach(obs => {
+        const info = speciesData.find(s => s.id === obs.speciesId);
+        const row = [
+            obs.speciesId, obs.speciesName, obs.scientificName,
+            info.type, info.leafComposition, info.leafArrangement, info.exudate,
+            (obs.note || "").replace(/;/g, ','),
+            new Date(obs.timestamp).toLocaleString()
+        ];
+        csvContent += row.join(";") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `DendroKey_Relatorio_${new Date().getTime()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 async function renderCollection() {
     const grid = document.getElementById('collection-grid');
     const observations = await getAllObservations();
@@ -107,11 +130,9 @@ async function renderCollection() {
     }
 
     observations.forEach(obs => {
-        // Busca os dados botânicos originais da espécie pelo ID
         const info = speciesData.find(s => s.id === obs.speciesId);
         const card = document.createElement('div');
         card.className = 'card';
-
         let imgTag = '<div style="height:180px; background:#ddd; display:flex; align-items:center; justify-content:center;">Sem Foto</div>';
         if (obs.photo) {
             const imgUrl = URL.createObjectURL(obs.photo);
@@ -122,34 +143,22 @@ async function renderCollection() {
             ${imgTag}
             <div class="card-body">
                 <div style="display:flex; justify-content:space-between; align-items:start;">
-                    <div>
-                        <div class="pop-name">${obs.speciesName}</div>
-                        <div class="sci-name">${obs.scientificName}</div>
-                    </div>
+                    <div><div class="pop-name">${obs.speciesName}</div><div class="sci-name">${obs.scientificName}</div></div>
                     <button class="btn-delete" onclick="window.confirmDelete(${obs.id})">🗑️</button>
                 </div>
-
                 <div class="traits-box">
                     <span><b>Hábito:</b> ${info.type}</span>
                     <span><b>Folha:</b> ${info.leafComposition}</span>
                     <span><b>Arranjo:</b> ${info.leafArrangement}</span>
                     <span><b>Exsudato:</b> ${info.exudate}</span>
                 </div>
-
                 <div class="note-box">${obs.note || 'Sem notas.'}</div>
-                <p style="font-size:0.65rem; color:#999; margin-top:8px;">📅 ${new Date(obs.timestamp).toLocaleString()}</p>
+                <p style="font-size:0.65rem; color:#999; margin-top:8px;">🕒 ${new Date(obs.timestamp).toLocaleString()}</p>
             </div>
         `;
         grid.appendChild(card);
     });
 }
-
-window.confirmDelete = async (id) => {
-    if (confirm('Deseja excluir este registro permanentemente?')) {
-        await deleteObservation(id);
-        renderCollection();
-    }
-};
 
 function setupEventListeners() {
     const fab = document.getElementById('fab-filter');
@@ -159,7 +168,15 @@ function setupEventListeners() {
     fab.onclick = () => { sidebar.classList.add('open'); overlay.classList.add('active'); };
     overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
     document.getElementById('close-filter').onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
-    document.getElementById('reset-btn').onclick = resetFilters;
+
+    document.getElementById('search-input').addEventListener('input', applyFilters);
+    document.getElementById('btn-export').onclick = exportToCSV;
+    document.getElementById('reset-btn').onclick = () => {
+        activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [] };
+        document.getElementById('search-input').value = '';
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        applyFilters();
+    };
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
@@ -177,24 +194,20 @@ function setupEventListeners() {
         const sp = speciesData.find(s => s.id === id);
         const photo = document.getElementById('photo-input').files[0];
         const note = document.getElementById('note-input').value;
-
-        await saveObservation({
-            speciesId: id,
-            speciesName: sp.popularNames[0],
-            scientificName: sp.scientificName,
-            photo: photo,
-            note: note
-        });
-
+        await saveObservation({ speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName, photo: photo, note: note });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Registro salvo!');
+        alert('Salvo!');
     };
 
     document.getElementById('photo-input').onchange = (e) => {
         document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto anexada" : "Nenhuma foto";
     };
 }
+
+window.confirmDelete = async (id) => {
+    if (confirm('Excluir permanentemente?')) { await deleteObservation(id); renderCollection(); }
+};
 
 window.openModal = (id) => {
     const sp = speciesData.find(s => s.id === id);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DendroKey - Cerrado MG</title>
+    <title>DendroKey - Inventário Florestal</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
@@ -31,7 +31,7 @@
         </nav>
 
         <div id="view-home" class="view-section active">
-            <input type="text" id="search-input" placeholder="Buscar espécie..." class="search-input">
+            <input type="text" id="search-input" placeholder="Digite nome popular ou científico..." class="search-input">
             <div class="results-header">
                 <span id="count-badge" class="count-badge">Carregando...</span>
             </div>
@@ -40,7 +40,7 @@
 
         <div id="view-collection" class="view-section hidden">
             <div style="padding: 0 15px;">
-                <button id="btn-export" class="btn-export">📊 Exportar Acervo para Excel (CSV)</button>
+                <button id="btn-export" class="btn-export">📊 Baixar Acervo (.CSV)</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
@@ -55,10 +55,10 @@
             <h3 id="modal-species-name">Registrar</h3>
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
-                <label for="photo-input" class="btn-camera">📷 Tirar Foto / Galeria</label>
+                <label for="photo-input" class="btn-camera">📷 Tirar Foto</label>
                 <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
-                <p id="photo-preview-text" style="font-size:0.8rem; margin:10px 0;">Nenhuma foto selecionada</p>
-                <textarea id="note-input" rows="3" placeholder="Anotações (ex: DAP, altura, local da obra)..."></textarea>
+                <p id="photo-preview-text" style="font-size:0.8rem; margin:10px 0; text-align:center;">Nenhuma foto</p>
+                <textarea id="note-input" rows="3" placeholder="Anotações de campo..."></textarea>
                 <button type="submit" class="btn-primary">Salvar no Acervo</button>
             </form>
             <button class="close-modal" style="margin-top:10px; background:none; border:none; color:red; cursor:pointer; width:100%;">Cancelar</button>
