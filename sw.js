@@ -1,5 +1,5 @@
-// DendroKey v9 - Cache Refresh
-const CACHE_NAME = 'dendrokey-v9';
+// sw.js - DendroKey v10 (Suporte para 600 espécies e novos filtros)
+const CACHE_NAME = 'dendrokey-v10';
 const ASSETS = [
     './',
     './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
     './db.js',
     './db_part2.js',
     './db_part3.js',
+    './db_part4.js', // NOVO: Parte 4
     './collection.js',
     './manifest.json',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'

@@ -1,12 +1,14 @@
 import { speciesData as part1 } from './db.js';
 import { speciesDataPart2 as part2 } from './db_part2.js';
 import { speciesDataPart3 as part3 } from './db_part3.js';
+import { speciesDataPart4 as part4 } from './db_part4.js';
 import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
-const speciesData = [...part1, ...part2, ...part3];
+// Unifica as 600 espécies
+const speciesData = [...part1, ...part2, ...part3, ...part4];
 
 let activeFilters = {
-    type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: []
+    type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [], flowerColor: []
 };
 
 async function init() {
@@ -22,8 +24,8 @@ function renderFilters() {
         { key: 'type', label: 'Hábito' },
         { key: 'leafArrangement', label: 'Filotaxia' },
         { key: 'leafComposition', label: 'Tipo de Folha' },
-        { key: 'leafMargin', label: 'Margem' },
         { key: 'exudate', label: 'Exsudato' },
+        { key: 'flowerColor', label: 'Cor da Flor' }, // NOVO FILTRO
         { key: 'spines', label: 'Espinhos' }
     ];
 
@@ -33,7 +35,7 @@ function renderFilters() {
         group.className = 'filter-group';
         group.innerHTML = `<p style="font-weight:bold; font-size:0.85rem; margin-bottom:5px;">${conf.label}</p>`;
 
-        const values = [...new Set(speciesData.map(s => String(s[conf.key])))].sort();
+        const values = [...new Set(speciesData.map(s => String(s[conf.key] || "Não Informado")))].sort();
         values.forEach(val => {
             const btn = document.createElement('button');
             btn.className = 'filter-btn';
@@ -88,8 +90,8 @@ function renderSpecies(list) {
                 <div class="traits-box">
                     <span><b>Família:</b> ${sp.family}</span>
                     <span><b>Hábito:</b> ${sp.type}</span>
-                    <span><b>Filotaxia:</b> ${sp.leafArrangement}</span>
                     <span><b>Folha:</b> ${sp.leafComposition}</span>
+                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
                     <span><b>Exsudato:</b> ${sp.exudate}</span>
                     <span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
                 </div>
@@ -98,7 +100,7 @@ function renderSpecies(list) {
                     <b>Destaque:</b> ${sp.specialFeatures}
                 </div>
 
-                <button class="btn-primary" style="margin-top:10px;" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
+                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
             </div>
         `;
         grid.appendChild(card);
@@ -151,7 +153,7 @@ async function renderCollection() {
                 <div class="traits-box">
                     <span><b>Família:</b> ${info.family}</span>
                     <span><b>Hábito:</b> ${info.type}</span>
-                    <span><b>Exsudato:</b> ${info.exudate}</span>
+                    <span><b>Flor:</b> ${info.flowerColor || 'N/A'}</span>
                     <span><b>Folha:</b> ${info.leafComposition}</span>
                     <span><b>ID:</b> #${obs.speciesId}</span>
                 </div>
@@ -176,7 +178,7 @@ function setupEventListeners() {
     document.getElementById('search-input').addEventListener('input', applyFilters);
     document.getElementById('btn-export').onclick = exportToCSV;
     document.getElementById('reset-btn').onclick = () => {
-        activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [] };
+        activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [], flowerColor: [] };
         document.getElementById('search-input').value = '';
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         applyFilters();
@@ -202,7 +204,7 @@ function setupEventListeners() {
         });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Registro salvo no caderno!');
+        alert('Registro salvo!');
     };
     document.getElementById('photo-input').onchange = (e) => {
         document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto Capturada" : "Nenhuma foto";
