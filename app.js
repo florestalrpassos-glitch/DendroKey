@@ -73,25 +73,25 @@ function applyFilters() {
     renderSpecies(filtered);
 }
 
-// Cards da Busca Principal com Características Visíveis
 function renderSpecies(list) {
     const grid = document.getElementById('results-grid');
-    document.getElementById('count-badge').textContent = `${list.length} espécies encontradas`;
+    document.getElementById('count-badge').textContent = `${list.length} espécies filtradas`;
     grid.innerHTML = '';
     list.forEach(sp => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
             <div class="card-body">
-                <p style="color:var(--primary); font-weight:bold; font-size:0.7rem; text-transform:uppercase;">${sp.family}</p>
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
 
                 <div class="traits-box">
+                    <span><b>Família:</b> ${sp.family}</span>
                     <span><b>Hábito:</b> ${sp.type}</span>
                     <span><b>Filotaxia:</b> ${sp.leafArrangement}</span>
                     <span><b>Folha:</b> ${sp.leafComposition}</span>
                     <span><b>Exsudato:</b> ${sp.exudate}</span>
+                    <span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
                 </div>
 
                 <div class="special-features-box">
@@ -117,7 +117,7 @@ async function exportToCSV() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Relatorio_DendroKey_${new Date().getTime()}.csv`;
+    link.download = `Inventario_DendroKey_${new Date().getTime()}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -149,10 +149,11 @@ async function renderCollection() {
                     <button class="btn-delete" onclick="window.confirmDelete(${obs.id})">🗑️</button>
                 </div>
                 <div class="traits-box">
+                    <span><b>Família:</b> ${info.family}</span>
                     <span><b>Hábito:</b> ${info.type}</span>
                     <span><b>Exsudato:</b> ${info.exudate}</span>
                     <span><b>Folha:</b> ${info.leafComposition}</span>
-                    <span><b>ID:</b> #${obs.id}</span>
+                    <span><b>ID:</b> #${obs.speciesId}</span>
                 </div>
                 <div class="note-box">${obs.note || 'Sem anotações.'}</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
@@ -201,7 +202,7 @@ function setupEventListeners() {
         });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Registro salvo!');
+        alert('Registro salvo no caderno!');
     };
     document.getElementById('photo-input').onchange = (e) => {
         document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto Capturada" : "Nenhuma foto";

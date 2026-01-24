@@ -1,4 +1,5 @@
-const CACHE_NAME = 'dendrokey-v6';
+// DendroKey v9 - Cache Refresh
+const CACHE_NAME = 'dendrokey-v9';
 const ASSETS = [
     './',
     './index.html',
