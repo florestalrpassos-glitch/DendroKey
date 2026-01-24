@@ -56,18 +56,14 @@ function renderFilters() {
 }
 
 function applyFilters() {
-    const searchInput = document.getElementById('search-input');
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
     const filtered = speciesData.filter(sp => {
         const matchesText = sp.scientificName.toLowerCase().includes(query) ||
                             sp.popularNames.some(p => p.toLowerCase().includes(query));
-
         const matchesFilters = Object.keys(activeFilters).every(key => {
             if (activeFilters[key].length === 0) return true;
             return activeFilters[key].includes(sp[key]);
         });
-
         return matchesText && matchesFilters;
     });
     renderSpecies(filtered);
@@ -75,7 +71,7 @@ function applyFilters() {
 
 function renderSpecies(list) {
     const grid = document.getElementById('results-grid');
-    document.getElementById('count-badge').textContent = `${list.length} espécies encontradas`;
+    document.getElementById('count-badge').textContent = `${list.length} espécies filtradas`;
     grid.innerHTML = '';
     list.forEach(sp => {
         const card = document.createElement('div');
@@ -85,7 +81,7 @@ function renderSpecies(list) {
                 <p style="color:var(--primary); font-weight:bold; font-size:0.7rem; text-transform:uppercase;">${sp.family}</p>
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
-                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
+                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
             </div>
         `;
         grid.appendChild(card);
@@ -97,15 +93,18 @@ async function exportToCSV() {
     if (data.length === 0) return alert('Acervo vazio.');
 
     let csvContent = "\uFEFF";
-    csvContent += "ID;Nome Popular;Nome Cientifico;Habito;Folha;Arranjo;Exsudato;Notas;Data\n";
+    csvContent += "ID;Nome Popular;Nome Cientifico;Lat;Long;Notas;Data;Hora\n";
 
     data.forEach(obs => {
-        const info = speciesData.find(s => s.id === obs.speciesId);
         const row = [
-            obs.speciesId, obs.speciesName, obs.scientificName,
-            info.type, info.leafComposition, info.leafArrangement, info.exudate,
+            obs.speciesId,
+            obs.speciesName,
+            obs.scientificName,
+            obs.lat || "S/GPS",
+            obs.lng || "S/GPS",
             (obs.note || "").replace(/;/g, ','),
-            new Date(obs.timestamp).toLocaleString()
+            new Date(obs.timestamp).toLocaleDateString(),
+            new Date(obs.timestamp).toLocaleTimeString()
         ];
         csvContent += row.join(";") + "\n";
     });
@@ -113,7 +112,7 @@ async function exportToCSV() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `DendroKey_Relatorio_${new Date().getTime()}.csv`;
+    link.download = `Inventario_DendroKey_${new Date().getTime()}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -125,7 +124,7 @@ async function renderCollection() {
     grid.innerHTML = '';
 
     if (observations.length === 0) {
-        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Acervo vazio.</p>';
+        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Nenhum registro no caderno.</p>';
         return;
     }
 
@@ -139,6 +138,10 @@ async function renderCollection() {
             imgTag = `<img src="${imgUrl}">`;
         }
 
+        const gpsLink = (obs.lat && obs.lng) ?
+            `<a href="https://www.google.com/maps?q=${obs.lat},${obs.lng}" target="_blank" class="maps-link">📍 Ver no Mapa</a>` :
+            `<span class="maps-link" style="color:#ccc;">📍 Sem GPS</span>`;
+
         card.innerHTML = `
             ${imgTag}
             <div class="card-body">
@@ -148,12 +151,15 @@ async function renderCollection() {
                 </div>
                 <div class="traits-box">
                     <span><b>Hábito:</b> ${info.type}</span>
+                    <span><b>Látex:</b> ${info.exudate}</span>
                     <span><b>Folha:</b> ${info.leafComposition}</span>
-                    <span><b>Arranjo:</b> ${info.leafArrangement}</span>
-                    <span><b>Exsudato:</b> ${info.exudate}</span>
+                    <span><b>ID:</b> #${obs.id}</span>
                 </div>
-                <div class="note-box">${obs.note || 'Sem notas.'}</div>
-                <p style="font-size:0.65rem; color:#999; margin-top:8px;">🕒 ${new Date(obs.timestamp).toLocaleString()}</p>
+                <div class="note-box">${obs.note || 'Sem anotações.'}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <p style="font-size:0.6rem; color:#999;">🕒 ${new Date(obs.timestamp).toLocaleString()}</p>
+                    ${gpsLink}
+                </div>
             </div>
         `;
         grid.appendChild(card);
@@ -192,28 +198,55 @@ function setupEventListeners() {
         e.preventDefault();
         const id = document.getElementById('modal-species-id').value;
         const sp = speciesData.find(s => s.id === id);
-        const photo = document.getElementById('photo-input').files[0];
-        const note = document.getElementById('note-input').value;
-        await saveObservation({ speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName, photo: photo, note: note });
+        await saveObservation({
+            speciesId: id,
+            speciesName: sp.popularNames[0],
+            scientificName: sp.scientificName,
+            photo: document.getElementById('photo-input').files[0],
+            note: document.getElementById('note-input').value,
+            lat: document.getElementById('lat-input').value,
+            lng: document.getElementById('lng-input').value
+        });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Salvo!');
+        alert('Registro salvo com GPS!');
     };
 
     document.getElementById('photo-input').onchange = (e) => {
-        document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto anexada" : "Nenhuma foto";
+        document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto Capturada" : "Nenhuma foto";
     };
 }
 
 window.confirmDelete = async (id) => {
-    if (confirm('Excluir permanentemente?')) { await deleteObservation(id); renderCollection(); }
+    if (confirm('Excluir este registro?')) { await deleteObservation(id); renderCollection(); }
 };
 
 window.openModal = (id) => {
     const sp = speciesData.find(s => s.id === id);
+    const gpsStatus = document.getElementById('gps-status');
     document.getElementById('modal-species-id').value = id;
-    document.getElementById('modal-species-name').textContent = sp.popularNames[0];
+    document.getElementById('modal-species-name').textContent = "Registrar " + sp.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
+
+    // Inicia captura de GPS
+    gpsStatus.textContent = "🛰️ Buscando sinal de GPS...";
+    gpsStatus.style.color = "orange";
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                document.getElementById('lat-input').value = pos.coords.latitude;
+                document.getElementById('lng-input').value = pos.coords.longitude;
+                gpsStatus.textContent = `✅ GPS fixado: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                gpsStatus.style.color = "green";
+            },
+            () => {
+                gpsStatus.textContent = "❌ GPS não disponível";
+                gpsStatus.style.color = "red";
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
 };
 
 document.querySelector('.close-modal').onclick = () => document.getElementById('add-modal').classList.add('hidden');
