@@ -71,7 +71,6 @@ function renderSpecies(list) {
             <div class="sci-name">${s.scientificName}</div>
             <div class="traits-box">
                 <span><b>Família:</b> ${s.family}</span><span><b>Hábito:</b> ${s.type}</span>
-                <span><b>Arranjo:</b> ${s.leafArrangement}</span><span><b>Látex:</b> ${s.exudate}</span>
             </div>
             <button class="btn-primary" onclick="window.openRegModal('${s.id}')">📷 Registrar</button>
         `;
@@ -83,7 +82,8 @@ function setupEvents() {
     document.getElementById('fab-filter').onclick = () => { document.getElementById('filter-sidebar').classList.add('open'); document.getElementById('overlay').classList.add('active'); };
     document.getElementById('close-filter').onclick = document.getElementById('overlay').onclick = () => { document.getElementById('filter-sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('active'); };
     document.getElementById('search-input').oninput = applyFilters;
-    document.getElementById('btn-export').onclick = exportToCSV;
+    document.getElementById('btn-export-csv').onclick = exportToCSV;
+    document.getElementById('btn-export-kml').onclick = exportToKML;
     document.getElementById('photo-input').onchange = (e) => { if(e.target.files.length > 0) document.getElementById('photo-feedback').classList.remove('hidden'); };
 
     document.getElementById('btn-clear-filters').onclick = () => {
@@ -117,7 +117,7 @@ function setupEvents() {
             utmE: document.getElementById('utm-e-input').value, utmN: document.getElementById('utm-n-input').value,
             timestamp: Date.now()
         });
-        alert("Salvo com sucesso!"); window.closeRegModal();
+        alert("Salvo no Caderno!"); window.closeRegModal();
     };
 }
 
@@ -129,7 +129,7 @@ window.openRegModal = (id) => {
     document.getElementById('modal-species-name').textContent = s.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
     const gps = document.getElementById('gps-status');
-    gps.textContent = "🛰️ Buscando UTM...";
+    gps.textContent = "🛰️ Obtendo Coordenadas...";
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
             const utm = toUTM(pos.coords.latitude, pos.coords.longitude);
@@ -137,7 +137,8 @@ window.openRegModal = (id) => {
             document.getElementById('lng-input').value = pos.coords.longitude;
             document.getElementById('utm-e-input').value = utm.e;
             document.getElementById('utm-n-input').value = utm.n;
-            gps.textContent = `✅ UTM: E ${utm.e} | N ${utm.n}`; gps.style.color = "green";
+            gps.textContent = `✅ GPS OK (Fuso 23S)`;
+            gps.style.color = "green";
         }, null, {enableHighAccuracy: true});
     }
 };
@@ -149,38 +150,28 @@ async function renderCollection() {
     const obs = await getAllObservations();
     grid.innerHTML = obs.length ? '' : '<p style="text-align:center; padding:50px;">Caderno vazio.</p>';
     obs.forEach(o => {
-        // Busca a ficha técnica original da espécie no banco de dados
         const sp = speciesData.find(s => s.id === o.speciesId);
         const card = document.createElement('div');
         card.className = 'card';
         let img = o.photo ? `<img src="${URL.createObjectURL(o.photo)}">` : '<div style="background:#eee; height:100px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">Sem Foto</div>';
-
         card.innerHTML = `
             ${img}
             <div style="display:flex; justify-content:space-between; align-items:start;">
                 <div><b>${o.speciesName}</b><br><small>${o.scientificName}</small></div>
-                <button onclick="window.deleteItem(${o.id})" style="border:none; background:none; color:red; font-size:1.8rem; cursor:pointer;">&times;</button>
+                <button onclick="window.deleteItem(${o.id})" style="border:none; background:none; color:red; font-size:1.8rem;">&times;</button>
             </div>
-
-            <div class="traits-box" style="background:#eef5f1; border: 1px solid #d1e2da;">
-                <span><b>Família:</b> ${sp.family}</span><span><b>Hábito:</b> ${sp.type}</span>
-                <span><b>Arranjo:</b> ${sp.leafArrangement}</span><span><b>Folha:</b> ${sp.leafComposition}</span>
-                <span><b>Látex:</b> ${sp.exudate}</span><span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
+            <div class="traits-box" style="background:#eef5f1;">
+                <span><b>Família:</b> ${sp.family}</span><span><b>DAP:</b> ${o.dap}cm</span>
+                <span><b>Altura:</b> ${o.h}m</span><span><b>Látex:</b> ${sp.exudate}</span>
             </div>
-
-            <div class="traits-box" style="background:#f9f9f9; color:#444;">
-                <span><b>DAP:</b> ${o.dap} cm</span><span><b>Alt:</b> ${o.h} m</span>
-                <span style="width:100%"><b>UTM:</b> E ${o.utmE} | N ${o.utmN}</span>
-            </div>
-
-            <p style="font-size:0.85rem; color:#333; margin:10px 0; border-left:3px solid var(--primary); padding-left:10px;">${o.note || 'Sem observações.'}</p>
-            <p style="font-size:0.6rem; color:#999; font-weight:bold;">🕒 ${new Date(o.timestamp).toLocaleString()}</p>
+            <p style="font-size:0.85rem; color:#333; margin:10px 0;">${o.note || 'Sem notas.'}</p>
+            <p style="font-size:0.6rem; color:#999; font-weight:bold;">📍 UTM: ${o.utmE}E / ${o.utmN}N</p>
         `;
         grid.appendChild(card);
     });
 }
 
-window.deleteItem = async (id) => { if(confirm("Apagar registro?")) { await deleteObservation(id); renderCollection(); } };
+window.deleteItem = async (id) => { if(confirm("Apagar?")) { await deleteObservation(id); renderCollection(); } };
 
 async function exportToCSV() {
     const data = await getAllObservations();
@@ -189,7 +180,48 @@ async function exportToCSV() {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Inventario_DendroKey_${Date.now()}.csv`;
+    link.download = "Inventario_DendroKey.csv";
+    link.click();
+}
+
+// FUNÇÃO DE EXPORTAÇÃO KML (GOOGLE EARTH)
+async function exportToKML() {
+    const data = await getAllObservations();
+    if (data.length === 0) return alert('Sem registros.');
+
+    let kml = `<?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document>
+        <name>Inventário DendroKey PRO</name>
+        <Style id="treeIcon">
+          <IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/pal2/icon5.png</href></Icon></IconStyle>
+        </Style>`;
+
+    data.forEach(o => {
+        kml += `
+        <Placemark>
+          <name>${o.speciesName}</name>
+          <description><![CDATA[
+            <b>Científico:</b> ${o.scientificName}<br/>
+            <b>DAP:</b> ${o.dap} cm<br/>
+            <b>Altura:</b> ${o.h} m<br/>
+            <b>Notas:</b> ${o.note || 'N/A'}<br/>
+            <b>UTM E:</b> ${o.utmE}<br/>
+            <b>UTM N:</b> ${o.utmN}
+          ]]></description>
+          <styleUrl>#treeIcon</styleUrl>
+          <Point>
+            <coordinates>${o.lng},${o.lat},0</coordinates>
+          </Point>
+        </Placemark>`;
+    });
+
+    kml += `</Document></kml>`;
+
+    const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Inventario_DendroKey_${Date.now()}.kml`;
     link.click();
 }
 

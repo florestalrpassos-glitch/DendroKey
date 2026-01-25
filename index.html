@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DendroKey PRO v33</title>
+    <title>DendroKey PRO v34</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
@@ -30,8 +30,9 @@
         </div>
 
         <div id="view-collection" class="view-section hidden">
-            <div style="padding:15px;">
-                <button id="btn-export" class="btn-export">📊 Exportar Inventário Completo (CSV)</button>
+            <div style="padding:15px; display: flex; gap: 10px;">
+                <button id="btn-export-csv" class="btn-export" style="flex: 1;">📊 Exportar CSV</button>
+                <button id="btn-export-kml" class="btn-export" style="flex: 1; background: #27ae60;">🌍 Exportar KML</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
@@ -47,7 +48,7 @@
     <div id="add-modal" class="modal hidden">
         <div class="modal-content">
             <h3 id="modal-species-name">Registrar</h3>
-            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ Obtendo UTM...</p>
+            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ Obtendo Coordenadas...</p>
 
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
@@ -55,7 +56,7 @@
                 <input type="hidden" id="utm-e-input"><input type="hidden" id="utm-n-input">
 
                 <label class="camera-label">
-                    📷 TIRAR FOTO DA ÁRVORE
+                    📷 TIRAR FOTO EM CAMPO
                     <input type="file" id="photo-input" accept="image/*" capture="camera">
                 </label>
                 <div id="photo-feedback" class="hidden" style="color:green; font-weight:bold; font-size:0.8rem; text-align:center; margin-bottom:15px;">✅ Foto Pronta!</div>
@@ -71,7 +72,7 @@
                     </div>
                 </div>
 
-                <textarea id="note-input" placeholder="Anotações de campo..." rows="3"></textarea>
+                <textarea id="note-input" placeholder="Observações..." rows="3"></textarea>
                 <button type="submit" id="save-obs-btn" class="btn-primary">SALVAR REGISTRO</button>
             </form>
             <button onclick="window.closeRegModal()" style="width:100%; background:none; border:none; color:red; margin-top:20px; font-weight:bold; cursor:pointer;">Cancelar</button>
