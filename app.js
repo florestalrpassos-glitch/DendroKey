@@ -5,67 +5,51 @@ import { speciesDataPart4 as part4 } from './db_part4.js';
 import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
 const speciesData = [...part1, ...part2, ...part3, ...part4];
-
-let activeFilters = {
-    type: [], leafArrangement: [], leafComposition: [], flowerColor: [], exudate: [], spines: []
-};
+let activeFilters = { type: [], flowerColor: [], leafArrangement: [], leafComposition: [], exudate: [] };
 
 async function init() {
-    await initDB();
-    renderFilters();
-    renderSpecies(speciesData);
-    setupEventListeners();
+    try {
+        await initDB();
+        renderFilters();
+        renderSpecies(speciesData);
+        setupEventListeners();
+    } catch (e) { console.error("Erro na inicialização:", e); }
 }
 
 function renderFilters() {
     const container = document.getElementById('filter-container');
-    const filterConfig = [
-        { key: 'type', label: 'Hábito' },
-        { key: 'flowerColor', label: 'Cor da Flor' },
-        { key: 'leafArrangement', label: 'Filotaxia' },
-        { key: 'leafComposition', label: 'Tipo de Folha' },
-        { key: 'exudate', label: 'Exsudato' },
-        { key: 'spines', label: 'Espinhos' }
+    const keys = [
+        {k:'type', l:'Hábito'}, {k:'flowerColor', l:'Flor'},
+        {k:'leafArrangement', l:'Filotaxia'}, {k:'leafComposition', l:'Folha'}
     ];
-
     container.innerHTML = '';
-    filterConfig.forEach(conf => {
-        const group = document.createElement('div');
-        group.className = 'filter-group';
-        group.innerHTML = `<p style="font-weight:bold; font-size:0.85rem; margin-bottom:5px;">${conf.label}</p>`;
-        const values = [...new Set(speciesData.map(s => String(s[conf.key] || "Não Informado")))].sort();
-        values.forEach(val => {
-            const btn = document.createElement('button');
-            btn.className = 'filter-btn';
-            btn.textContent = val === 'true' ? 'Sim' : val === 'false' ? 'Não' : val;
-            btn.onclick = () => {
-                const actualVal = val === 'true' ? true : val === 'false' ? false : val;
-                if (activeFilters[conf.key].includes(actualVal)) {
-                    activeFilters[conf.key] = activeFilters[conf.key].filter(v => v !== actualVal);
-                    btn.classList.remove('active');
-                } else {
-                    activeFilters[conf.key].push(actualVal);
-                    btn.classList.add('active');
-                }
+    keys.forEach(conf => {
+        const div = document.createElement('div');
+        div.innerHTML = `<p style="font-weight:bold; font-size:0.8rem; margin:10px 0 5px;">${conf.l}</p>`;
+        const vals = [...new Set(speciesData.map(s => String(s[conf.k] || "N/I")))].sort();
+        vals.forEach(v => {
+            const b = document.createElement('button');
+            b.className = 'filter-btn';
+            b.textContent = v;
+            b.onclick = () => {
+                if(activeFilters[conf.k].includes(v)) activeFilters[conf.k] = activeFilters[conf.k].filter(x => x !== v);
+                else activeFilters[conf.k].push(v);
+                b.classList.toggle('active');
                 applyFilters();
             };
-            group.appendChild(btn);
+            div.appendChild(b);
         });
-        container.appendChild(group);
+        container.appendChild(div);
     });
 }
 
 function applyFilters() {
-    const searchInput = document.getElementById('search-input');
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const query = document.getElementById('search-input').value.toLowerCase();
     const filtered = speciesData.filter(sp => {
-        const matchesText = sp.scientificName.toLowerCase().includes(query) ||
-                            sp.popularNames.some(p => p.toLowerCase().includes(query));
-        const matchesFilters = Object.keys(activeFilters).every(key => {
-            if (activeFilters[key].length === 0) return true;
-            return activeFilters[key].includes(sp[key]);
-        });
-        return matchesText && matchesFilters;
+        const txt = sp.scientificName.toLowerCase() + sp.popularNames.join().toLowerCase();
+        const mTxt = txt.includes(query);
+        const mFil = Object.keys(activeFilters).every(k => activeFilters[k].length === 0 || activeFilters[k].includes(String(sp[k])));
+        return mTxt && mFil;
     });
     renderSpecies(filtered);
 }
@@ -74,83 +58,91 @@ function renderSpecies(list) {
     const grid = document.getElementById('results-grid');
     document.getElementById('count-badge').textContent = `${list.length} espécies encontradas`;
     grid.innerHTML = '';
-
     list.forEach(sp => {
         const card = document.createElement('div');
         card.className = 'card';
-        const imgUrl = sp.imageUrl || 'https://via.placeholder.com/400x250/2d6a4f/ffffff?text=Foto+Indisponível';
-
         card.innerHTML = `
-            <img src="${imgUrl}" class="card-img" alt="${sp.popularNames[0]}" onerror="this.src='https://via.placeholder.com/400x250/2d6a4f/ffffff?text=Erro+ao+Carregar'">
+            <img src="${sp.imageUrl || ''}" class="card-img" onerror="this.src='https://via.placeholder.com/300x150?text=S/Foto'">
             <div class="card-body">
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
                 <div class="traits-box">
                     <span><b>Família:</b> ${sp.family}</span>
                     <span><b>Hábito:</b> ${sp.type}</span>
-                    <span><b>Filotaxia:</b> ${sp.leafArrangement}</span>
-                    <span><b>Folha:</b> ${sp.leafComposition}</span>
-                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
-                    <span><b>Exsudato:</b> ${sp.exudate}</span>
                 </div>
-                <div class="special-features-box"><b>Destaque:</b> ${sp.specialFeatures}</div>
-                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
+                <button class="btn-primary reg-btn" data-id="${sp.id}">📷 Registrar</button>
             </div>
         `;
         grid.appendChild(card);
     });
+
+    // Evento de clique nos botões de registro
+    document.querySelectorAll('.reg-btn').forEach(btn => {
+        btn.onclick = () => window.openModal(btn.dataset.id);
+    });
 }
 
-// FUNÇÕES DE CADERNO DE CAMPO
-async function exportToCSV() {
-    const data = await getAllObservations();
-    if (data.length === 0) return alert('Acervo vazio.');
-    let csvContent = "\uFEFF";
-    csvContent += "ID;Nome Popular;Nome Cientifico;Lat;Long;Notas;Data;Hora\n";
-    data.forEach(obs => {
-        const row = [obs.speciesId, obs.speciesName, obs.scientificName, obs.lat || "S/GPS", obs.lng || "S/GPS", (obs.note || "").replace(/;/g, ','), new Date(obs.timestamp).toLocaleDateString(), new Date(obs.timestamp).toLocaleTimeString()];
-        csvContent += row.join(";") + "\n";
+function setupEventListeners() {
+    document.getElementById('fab-filter').onclick = () => {
+        document.getElementById('filter-sidebar').classList.add('open');
+        document.getElementById('overlay').classList.add('active');
+    };
+    document.getElementById('close-filter').onclick = () => {
+        document.getElementById('filter-sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
+    };
+    document.getElementById('search-input').oninput = applyFilters;
+    document.getElementById('close-modal-btn').onclick = () => document.getElementById('add-modal').classList.add('hidden');
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+            btn.classList.add('active');
+            document.getElementById(`view-${btn.dataset.target}`).classList.remove('hidden');
+            if(btn.dataset.target === 'collection') renderCollection();
+        };
     });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Relatorio_DendroKey_${new Date().getTime()}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    document.getElementById('add-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('modal-species-id').value;
+        const sp = speciesData.find(s => s.id === id);
+        await saveObservation({
+            speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName,
+            note: document.getElementById('note-input').value,
+            lat: document.getElementById('lat-input').value, lng: document.getElementById('lng-input').value
+        });
+        document.getElementById('add-modal').classList.add('hidden');
+        alert('Salvo com sucesso!');
+    };
 }
+
+window.openModal = (id) => {
+    const sp = speciesData.find(s => s.id === id);
+    document.getElementById('modal-species-id').value = id;
+    document.getElementById('modal-species-name').textContent = sp.popularNames[0];
+    document.getElementById('add-modal').classList.remove('hidden');
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            document.getElementById('lat-input').value = pos.coords.latitude;
+            document.getElementById('lng-input').value = pos.coords.longitude;
+            document.getElementById('gps-status').textContent = "✅ GPS OK";
+        }, null, {enableHighAccuracy: true});
+    }
+};
 
 async function renderCollection() {
     const grid = document.getElementById('collection-grid');
-    const observations = await getAllObservations();
-    grid.innerHTML = '';
-    if (observations.length === 0) {
-        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Acervo vazio.</p>';
-        return;
-    }
-    observations.forEach(obs => {
-        const info = speciesData.find(s => s.id === obs.speciesId);
+    const obs = await getAllObservations();
+    grid.innerHTML = obs.length ? '' : '<p style="text-align:center; padding:20px;">Vazio.</p>';
+    obs.forEach(o => {
         const card = document.createElement('div');
         card.className = 'card';
-        let imgTag = '<div style="height:180px; background:#ddd; display:flex; align-items:center; justify-content:center;">Sem Foto</div>';
-        if (obs.photo) {
-            const imgUrl = URL.createObjectURL(obs.photo);
-            imgTag = `<img src="${imgUrl}">`;
-        }
-        card.innerHTML = `
-            ${imgTag}
-            <div class="card-body">
-                <div style="display:flex; justify-content:space-between; align-items:start;">
-                    <div><div class="pop-name">${obs.speciesName}</div><div class="sci-name">${obs.scientificName}</div></div>
-                    <button class="btn-delete" onclick="window.confirmDelete(${obs.id})">🗑️</button>
-                </div>
-                <div class="traits-box">
-                    <span><b>Família:</b> ${info.family}</span>
-                    <span><b>Hábito:</b> ${info.type}</span>
-                    <span><b>ID:</b> #${obs.speciesId}</span>
-                </div>
-                <div class="note-box">${obs.note || 'Sem anotações.'}</div>
-                <p style="font-size:0.6rem; color:#999; margin-top:10px;">🕒 ${new Date(obs.timestamp).toLocaleString()}</p>
-            </div>
-        `;
+        card.innerHTML = `<div class="card-body"><b>${o.speciesName}</b><br><small>${o.note}</small></div>`;
         grid.appendChild(card);
+    });
+}
+
+init();

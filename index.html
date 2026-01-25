@@ -2,72 +2,59 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DendroKey - Inventário Profissional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DendroKey PRO</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1b4332">
 </head>
 <body>
     <header>
         <div class="logo">🌿 <span>DendroKey PRO</span></div>
-        <button id="reset-btn" class="reset-btn">Limpar Filtros</button>
+        <button id="reset-btn" class="reset-btn">Limpar</button>
     </header>
 
     <div id="filter-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Filtros Botânicos</h3>
-            <button id="close-filter" class="close-btn">&times;</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Filtros</h3>
+            <button id="close-filter" style="background:none; border:none; font-size:2rem;">×</button>
         </div>
         <div id="filter-container"></div>
     </div>
     <div id="overlay" class="overlay"></div>
 
-    <div class="app-container">
-        <nav class="main-nav">
-            <button class="nav-btn active" data-target="home">🔍 Identificar</button>
-            <button class="nav-btn" data-target="collection">📓 Meu Acervo</button>
-        </nav>
-
-        <div id="view-home" class="view-section active">
-            <input type="text" id="search-input" placeholder="Digite nome popular ou científico..." class="search-input">
-            <div class="results-header">
-                <span id="count-badge" class="count-badge">Carregando espécies...</span>
-            </div>
+    <main class="app-container">
+        <div id="view-home" class="view-section">
+            <input type="text" id="search-input" placeholder="Buscar espécie..." class="search-input">
+            <div style="padding:0 15px;"><span id="count-badge" class="count-badge">Carregando...</span></div>
             <div id="results-grid" class="species-grid"></div>
         </div>
 
         <div id="view-collection" class="view-section hidden">
-            <div style="padding: 0 15px;">
-                <button id="btn-export" class="btn-export">📊 Baixar Relatório (.CSV) com GPS</button>
+            <div style="padding:15px;">
+                <button id="btn-export" class="btn-export">📊 Baixar Relatório CSV</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
-    </div>
+    </main>
 
-    <button id="fab-filter" class="fab">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-    </button>
+    <button id="fab-filter" class="fab">🔍</button>
+
+    <nav class="main-nav">
+        <button class="nav-btn active" data-target="home">Espécies</button>
+        <button class="nav-btn" data-target="collection">Caderno</button>
+    </nav>
 
     <div id="add-modal" class="modal hidden">
         <div class="modal-content">
             <h3 id="modal-species-name">Registrar</h3>
-            <div id="gps-status" class="gps-badge">🛰️ Buscando GPS...</div>
+            <p id="gps-status" style="font-size:0.7rem; margin:10px 0;">🛰️ GPS aguardando...</p>
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
-                <input type="hidden" id="lat-input">
-                <input type="hidden" id="lng-input">
-
-                <label for="photo-input" class="btn-camera">📷 Capturar Foto da Árvore</label>
-                <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
-                <p id="photo-preview-text" style="font-size:0.8rem; margin:10px 0; text-align:center;">Nenhuma foto capturada</p>
-
-                <textarea id="note-input" rows="3" placeholder="Anotações de campo (DAP, Altura, Estado Fitossanitário)..."></textarea>
-
-                <button type="submit" class="btn-primary">Salvar no Caderno de Campo</button>
+                <input type="hidden" id="lat-input"><input type="hidden" id="lng-input">
+                <textarea id="note-input" placeholder="DAP, Altura, Observações..."></textarea>
+                <button type="submit" class="btn-primary">Salvar Registro</button>
             </form>
-            <button class="close-modal" style="margin-top:10px; background:none; border:none; color:red; cursor:pointer; width:100%;">Cancelar</button>
+            <button id="close-modal-btn" style="width:100%; background:none; border:none; color:red; margin-top:15px; cursor:pointer;">Cancelar</button>
         </div>
     </div>
 
