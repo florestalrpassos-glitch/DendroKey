@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dendrokey-v25';
-const ASSETS = ['./', './index.html', './style.css', './app.js', './collection.js', './db.js', './db_part2.js', './db_part3.js', './db_part4.js', './manifest.json'];
+const CACHE_NAME = 'dendrokey-v26';
+const ASSETS = ['./', './index.html', './style.css', './app.js', './db.js', './db_part2.js', './db_part3.js', './db_part4.js', './collection.js', './manifest.json'];
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
