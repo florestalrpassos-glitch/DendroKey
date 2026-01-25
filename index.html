@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DendroKey PRO v28</title>
+    <title>DendroKey PRO v29</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
@@ -31,7 +31,7 @@
 
         <div id="view-collection" class="view-section hidden">
             <div style="padding:15px;">
-                <button id="btn-export" class="btn-export">📊 Exportar Inventário (CSV)</button>
+                <button id="btn-export" class="btn-export">📊 Exportar Inventário UTM (CSV)</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
@@ -47,12 +47,14 @@
     <div id="add-modal" class="modal hidden">
         <div class="modal-content">
             <h3 id="modal-species-name">Registrar</h3>
-            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ GPS aguardando sinal...</p>
+            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ Obtendo UTM...</p>
 
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
                 <input type="hidden" id="lat-input">
                 <input type="hidden" id="lng-input">
+                <input type="hidden" id="utm-e-input">
+                <input type="hidden" id="utm-n-input">
 
                 <label class="camera-label">
                     📷 TIRAR FOTO EM CAMPO
@@ -60,8 +62,8 @@
                 </label>
                 <div id="photo-feedback" class="hidden" style="color:green; font-weight:bold; font-size:0.8rem; text-align:center; margin-bottom:15px;">✅ Foto Pronta!</div>
 
-                <textarea id="note-input" placeholder="Notas: DAP, Altura, Fenologia, Ponto de Vistoria..." rows="4"></textarea>
-                <button type="submit" id="save-obs-btn" class="btn-primary">SALVAR REGISTRO</button>
+                <textarea id="note-input" placeholder="Anotações: DAP, Altura, Fenologia, Ponto..." rows="4"></textarea>
+                <button type="submit" id="save-obs-btn" class="btn-primary">SALVAR NO CADERNO</button>
             </form>
             <button onclick="window.closeRegModal()" style="width:100%; background:none; border:none; color:red; margin-top:20px; font-weight:bold; cursor:pointer;">Cancelar</button>
         </div>
