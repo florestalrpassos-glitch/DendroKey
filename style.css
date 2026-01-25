@@ -15,8 +15,8 @@ header { background: var(--primary-dark); color: white; padding: 1rem; display: 
 .pop-name { font-weight: 700; font-size: 1.2rem; color: var(--primary-dark); }
 .sci-name { font-style: italic; color: #555; font-size: 1rem; margin-bottom: 12px; display: block; }
 
-.traits-box { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; padding: 10px; background: #eef5f1; border-radius: 8px; font-size: 0.75rem; color: #2d6a4f; border: 1px solid #d1e2da; }
-.traits-box span { width: 48%; }
+.traits-box { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; padding: 10px; background: #eef5f1; border-radius: 8px; font-size: 0.72rem; color: #2d6a4f; border: 1px solid #d1e2da; }
+.traits-box span { width: 48%; margin-bottom: 2px; }
 
 .camera-label { display: block; background: #34495e; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin: 10px 0; cursor: pointer; }
 #photo-input { display: none; }

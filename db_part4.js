@@ -7,7 +7,7 @@ export const speciesDataPart4 = [
             "id": id.toString(),
             "scientificName": `Espécie Nativa ${id}`,
             "popularNames": [`Planta de Campo ${id}`],
-            "family": "A identificar", "type": "Árvore", "leafArrangement": "Alterna", "leafComposition": "Simples", "exudate": "Ausente", "spines": false, "flowerColor": "N/A", "specialFeatures": "Registro para inventário ambiental."
+            "family": "A identificar", "type": "Árvore", "leafArrangement": "Alterna", "leafComposition": "Simples", "exudate": "Ausente", "spines": false, "flowerColor": "N/A", "specialFeatures": "Registro ambiental."
         };
     })
 ];

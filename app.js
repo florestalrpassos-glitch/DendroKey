@@ -71,6 +71,7 @@ function renderSpecies(list) {
             <div class="sci-name">${s.scientificName}</div>
             <div class="traits-box">
                 <span><b>Família:</b> ${s.family}</span><span><b>Hábito:</b> ${s.type}</span>
+                <span><b>Arranjo:</b> ${s.leafArrangement}</span><span><b>Látex:</b> ${s.exudate}</span>
             </div>
             <button class="btn-primary" onclick="window.openRegModal('${s.id}')">📷 Registrar</button>
         `;
@@ -106,7 +107,6 @@ function setupEvents() {
         e.preventDefault();
         const id = document.getElementById('modal-species-id').value;
         const sp = speciesData.find(x => x.id === id);
-
         await saveObservation({
             speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName,
             photo: document.getElementById('photo-input').files[0] || null,
@@ -129,7 +129,7 @@ window.openRegModal = (id) => {
     document.getElementById('modal-species-name').textContent = s.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
     const gps = document.getElementById('gps-status');
-    gps.textContent = "🛰️ Buscando UTM..."; gps.style.color = "orange";
+    gps.textContent = "🛰️ Buscando UTM...";
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
             const utm = toUTM(pos.coords.latitude, pos.coords.longitude);
@@ -149,22 +149,38 @@ async function renderCollection() {
     const obs = await getAllObservations();
     grid.innerHTML = obs.length ? '' : '<p style="text-align:center; padding:50px;">Caderno vazio.</p>';
     obs.forEach(o => {
-        const info = speciesData.find(s => s.id === o.speciesId);
+        // Busca a ficha técnica original da espécie no banco de dados
+        const sp = speciesData.find(s => s.id === o.speciesId);
         const card = document.createElement('div');
         card.className = 'card';
         let img = o.photo ? `<img src="${URL.createObjectURL(o.photo)}">` : '<div style="background:#eee; height:100px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">Sem Foto</div>';
+
         card.innerHTML = `
             ${img}
-            <b>${o.speciesName}</b><br><small>${o.scientificName}</small>
-            <div class="traits-box" style="background:#f9f9f9; color:#444;">
-                <span><b>DAP:</b> ${o.dap}cm</span><span><b>H:</b> ${o.h}m</span>
-                <span><b>UTM E:</b> ${o.utmE}</span><span><b>UTM N:</b> ${o.utmN}</span>
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div><b>${o.speciesName}</b><br><small>${o.scientificName}</small></div>
+                <button onclick="window.deleteItem(${o.id})" style="border:none; background:none; color:red; font-size:1.8rem; cursor:pointer;">&times;</button>
             </div>
-            <p style="font-size:0.8rem; color:#333; margin:5px 0;">${o.note}</p>
+
+            <div class="traits-box" style="background:#eef5f1; border: 1px solid #d1e2da;">
+                <span><b>Família:</b> ${sp.family}</span><span><b>Hábito:</b> ${sp.type}</span>
+                <span><b>Arranjo:</b> ${sp.leafArrangement}</span><span><b>Folha:</b> ${sp.leafComposition}</span>
+                <span><b>Látex:</b> ${sp.exudate}</span><span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
+            </div>
+
+            <div class="traits-box" style="background:#f9f9f9; color:#444;">
+                <span><b>DAP:</b> ${o.dap} cm</span><span><b>Alt:</b> ${o.h} m</span>
+                <span style="width:100%"><b>UTM:</b> E ${o.utmE} | N ${o.utmN}</span>
+            </div>
+
+            <p style="font-size:0.85rem; color:#333; margin:10px 0; border-left:3px solid var(--primary); padding-left:10px;">${o.note || 'Sem observações.'}</p>
+            <p style="font-size:0.6rem; color:#999; font-weight:bold;">🕒 ${new Date(o.timestamp).toLocaleString()}</p>
         `;
         grid.appendChild(card);
     });
 }
+
+window.deleteItem = async (id) => { if(confirm("Apagar registro?")) { await deleteObservation(id); renderCollection(); } };
 
 async function exportToCSV() {
     const data = await getAllObservations();
@@ -173,7 +189,7 @@ async function exportToCSV() {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "Inventario_DendroKey.csv";
+    link.download = `Inventario_DendroKey_${Date.now()}.csv`;
     link.click();
 }
 
