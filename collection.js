@@ -1,6 +1,6 @@
 export function initDB() {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 1);
+        const request = indexedDB.open('DendroKeyDB', 2);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
             if (!db.objectStoreNames.contains('observations')) {
@@ -13,7 +13,7 @@ export function initDB() {
 
 export function saveObservation(data) {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 1);
+        const request = indexedDB.open('DendroKeyDB', 2);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readwrite');
@@ -25,7 +25,7 @@ export function saveObservation(data) {
 
 export function getAllObservations() {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 1);
+        const request = indexedDB.open('DendroKeyDB', 2);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readonly');
@@ -36,7 +36,7 @@ export function getAllObservations() {
 
 export function deleteObservation(id) {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 1);
+        const request = indexedDB.open('DendroKeyDB', 2);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readwrite');
