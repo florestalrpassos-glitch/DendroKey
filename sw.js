@@ -1,7 +1,7 @@
-const CACHE_NAME = 'dendrokey-v23';
+const CACHE_NAME = 'dendrokey-v24';
 const ASSETS = [
     './', './index.html', './style.css', './app.js', './db.js',
-    './db_part2.js', './db_part3.js', './db_part4.js', './collection.js'
+    './db_part2.js', './db_part3.js', './db_part4.js', './collection.js', './manifest.json'
 ];
 
 self.addEventListener('install', e => {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DendroKey LIGHT v23</title>
+    <title>DendroKey v24</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
@@ -15,7 +15,7 @@
 
     <div id="filter-sidebar" class="sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Filtros Botânicos</h3>
+            <h3>Filtros</h3>
             <button id="close-filter" style="background:none; border:none; font-size:2rem;">&times;</button>
         </div>
         <div id="filter-container"></div>
@@ -24,14 +24,14 @@
 
     <main>
         <div id="view-home" class="view-section">
-            <input type="text" id="search-input" placeholder="Buscar por nome ou família..." class="search-input">
-            <div style="padding:0 15px;"><span id="count-badge" class="count-badge">Carregando espécies...</span></div>
+            <input type="text" id="search-input" placeholder="Buscar espécie..." class="search-input">
+            <div style="padding:0 15px;"><span id="count-badge" class="count-badge">Calculando...</span></div>
             <div id="results-grid" class="species-grid"></div>
         </div>
 
         <div id="view-collection" class="view-section hidden">
             <div style="padding:15px;">
-                <button id="btn-export" class="btn-export">📊 Exportar CSV (Excel)</button>
+                <button id="btn-export" class="btn-export">📊 Exportar Inventário CSV</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
@@ -51,7 +51,14 @@
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
                 <input type="hidden" id="lat-input"><input type="hidden" id="lng-input">
-                <textarea id="note-input" placeholder="DAP, Altura, Fenologia, Ponto..." rows="4"></textarea>
+
+                <label class="camera-btn">
+                    📷 Tirar Foto da Espécie
+                    <input type="file" id="photo-input" accept="image/*" capture="camera" style="display:none;">
+                </label>
+                <div id="photo-preview" style="font-size:0.7rem; color:green; margin-top:5px; display:none;">✅ Foto capturada</div>
+
+                <textarea id="note-input" placeholder="Notas: DAP, Altura, Estado Fitossanitário..." rows="4"></textarea>
                 <button type="submit" class="btn-primary">Salvar no Acervo</button>
             </form>
             <button id="close-modal-btn" style="width:100%; background:none; border:none; color:#e63946; margin-top:15px;">Cancelar</button>
