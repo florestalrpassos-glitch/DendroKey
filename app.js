@@ -14,7 +14,7 @@ async function init() {
     setupEventListeners();
 }
 
-// ... (renderFilters e applyFilters permanecem iguais à v23)
+// ... (renderFilters e applyFilters permanecem iguais)
 
 function renderSpecies(list) {
     const grid = document.getElementById('results-grid');
@@ -42,13 +42,49 @@ function setupEventListeners() {
     document.getElementById('search-input').oninput = applyFilters;
     document.getElementById('reset-btn').onclick = () => location.reload();
     document.getElementById('close-modal-btn').onclick = () => document.getElementById('add-modal').classList.add('hidden');
-    document.getElementById('btn-export').onclick = exportToCSV;
 
-    // Monitora a captura da foto
-    document.getElementById('photo-input').onchange = (e) => {
-        if(e.target.files.length > 0) document.getElementById('photo-preview').style.display = 'block';
+    // Feedback visual da foto
+    const photoInput = document.getElementById('photo-input');
+    photoInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            document.getElementById('photo-preview-box').classList.remove('hidden');
+        }
+    });
+
+    document.getElementById('add-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const saveBtn = document.getElementById('btn-save-obs');
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Salvando...";
+
+        const id = document.getElementById('modal-species-id').value;
+        const sp = speciesData.find(s => s.id === id);
+        const photoFile = document.getElementById('photo-input').files[0];
+
+        try {
+            await saveObservation({
+                speciesId: id,
+                speciesName: sp.popularNames[0],
+                scientificName: sp.scientificName,
+                photo: photoFile || null, // Salva o arquivo binário direto
+                note: document.getElementById('note-input').value,
+                lat: document.getElementById('lat-input').value,
+                lng: document.getElementById('lng-input').value,
+                timestamp: Date.now()
+            });
+            alert('Registro salvo!');
+            document.getElementById('add-modal').classList.add('hidden');
+            document.getElementById('add-form').reset();
+            document.getElementById('photo-preview-box').classList.add('hidden');
+        } catch (err) {
+            alert('Erro ao salvar. Verifique o espaço no celular.');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = "SALVAR NO CADERNO";
+        }
     };
 
+    // Navegação
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -58,30 +94,39 @@ function setupEventListeners() {
             if(btn.dataset.target === 'collection') renderCollection();
         };
     });
-
-    document.getElementById('add-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('modal-species-id').value;
-        const sp = speciesData.find(s => s.id === id);
-        const photoFile = document.getElementById('photo-input').files[0];
-
-        await saveObservation({
-            speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName,
-            photo: photoFile, // SALVA O ARQUIVO DA CÂMERA
-            note: document.getElementById('note-input').value,
-            lat: document.getElementById('lat-input').value, lng: document.getElementById('lng-input').value,
-            timestamp: Date.now()
-        });
-        document.getElementById('add-modal').classList.add('hidden');
-        document.getElementById('add-form').reset();
-        document.getElementById('photo-preview').style.display = 'none';
-        alert('Registro salvo com foto!');
-    };
 }
 
+async function renderCollection() {
+    const grid = document.getElementById('collection-grid');
+    const obs = await getAllObservations();
+    grid.innerHTML = obs.length ? '' : '<p style="text-align:center; padding:30px;">Acervo vazio.</p>';
+
+    obs.forEach(o => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        let imgHtml = '<div style="background:#eee; height:150px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#999;">Sem foto registrada</div>';
+
+        if(o.photo) {
+            const url = URL.createObjectURL(o.photo);
+            imgHtml = `<img src="${url}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`;
+        }
+
+        card.innerHTML = `
+            ${imgHtml}
+            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                <b>${o.speciesName}</b>
+                <button onclick="window.delItem(${o.id})" style="border:none; background:none; color:red;">🗑️</button>
+            </div>
+            <p style="font-size:0.8rem; color:#444; margin:5px 0;">${o.note}</p>
+            <p style="font-size:0.6rem; color:#999;">📍 ${o.lat}, ${o.lng} | 🕒 ${new Date(o.timestamp).toLocaleString()}</p>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// Funções globais para o Modal e Delete
 window.openModal = (id) => {
     const sp = speciesData.find(s => s.id === id);
-    const gps = document.getElementById('gps-status');
     document.getElementById('modal-species-id').value = id;
     document.getElementById('modal-species-name').textContent = sp.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
@@ -89,35 +134,11 @@ window.openModal = (id) => {
         navigator.geolocation.getCurrentPosition(pos => {
             document.getElementById('lat-input').value = pos.coords.latitude;
             document.getElementById('lng-input').value = pos.coords.longitude;
-            gps.textContent = `✅ GPS Fixado`; gps.style.color = "green";
+            document.getElementById('gps-status').textContent = "✅ GPS Fixado";
         }, null, {enableHighAccuracy: true});
     }
 };
 
-async function renderCollection() {
-    const grid = document.getElementById('collection-grid');
-    const obs = await getAllObservations();
-    grid.innerHTML = obs.length ? '' : '<p style="text-align:center; padding:30px;">Vazio.</p>';
-    obs.forEach(o => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        let imgHtml = '';
-        if(o.photo) {
-            const url = URL.createObjectURL(o.photo);
-            imgHtml = `<img src="${url}">`;
-        }
-        card.innerHTML = `
-            ${imgHtml}
-            <div style="display:flex; justify-content:space-between;">
-                <b>${o.speciesName}</b>
-                <button onclick="window.delItem(${o.id})" style="border:none; background:none; color:red;">🗑️</button>
-            </div>
-            <p style="font-size:0.75rem;">${o.note}</p>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-window.delItem = async (id) => { if(confirm('Excluir?')) { await deleteObservation(id); renderCollection(); } };
+window.delItem = async (id) => { if(confirm('Excluir este registro?')) { await deleteObservation(id); renderCollection(); } };
 
 init();
