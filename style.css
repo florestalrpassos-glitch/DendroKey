@@ -18,9 +18,6 @@ header { background: var(--primary-dark); color: white; padding: 1rem; display: 
 
 .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: white; z-index: 1001; transition: 0.3s; padding: 20px; overflow-y: auto; }
 .sidebar.open { right: 0; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1000; }
 .overlay.active { display: block; }
 
@@ -30,7 +27,16 @@ header { background: var(--primary-dark); color: white; padding: 1rem; display: 
 
 .species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 15px; }
 .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #eee; }
-.card img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+
+/* Estilo das Fotos da Internet */
+.card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background-color: #eee;
+    border-bottom: 1px solid #eee;
+}
+
 .card-body { padding: 15px; }
 .pop-name { font-weight: 700; font-size: 1.1rem; color: var(--primary-dark); }
 .sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 10px; display: block; }
@@ -59,10 +65,7 @@ header { background: var(--primary-dark); color: white; padding: 1rem; display: 
     margin-bottom: 10px;
 }
 
-.note-box { font-style: italic; font-size: 0.85rem; color: #444; padding: 8px; border-left: 4px solid var(--accent); background: #fdfdfd; margin: 5px 0; }
-
 .btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; }
-.btn-delete { background: #fee2e2; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--danger); }
 .btn-export { width: 100%; padding: 12px; background: #34495e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 10px 0; }
 
 .main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 100; height: 70px; }
@@ -71,7 +74,4 @@ header { background: var(--primary-dark); color: white; padding: 1rem; display: 
 
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .modal-content { background: white; padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; }
-.gps-badge { font-size: 0.7rem; text-align: center; padding: 5px; background: #e9ecef; border-radius: 5px; margin-bottom: 10px; color: #495057; font-weight: bold; }
-.maps-link { font-size: 0.75rem; color: var(--primary); text-decoration: none; font-weight: bold; }
-
 .hidden { display: none !important; }

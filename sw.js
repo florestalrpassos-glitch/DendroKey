@@ -1,5 +1,4 @@
-// sw.js - DendroKey v12
-const CACHE_NAME = 'dendrokey-v12';
+const CACHE_NAME = 'dendrokey-v13';
 const ASSETS = [
     './',
     './index.html',
@@ -10,8 +9,7 @@ const ASSETS = [
     './db_part3.js',
     './db_part4.js',
     './collection.js',
-    './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'
+    './manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
