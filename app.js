@@ -78,28 +78,35 @@ function renderSpecies(list) {
         const card = document.createElement('div');
         card.className = 'card';
 
-        // Usa placeholder verde se a URL da foto estiver vazia
-        const imgUrl = sp.imageUrl || 'https://via.placeholder.com/400x250/2d6a4f/ffffff?text=Sem+Foto';
+        // Correção do carregamento da foto
+        const imgUrl = sp.imageUrl || 'https://via.placeholder.com/400x250/2d6a4f/ffffff?text=Foto+Indisponível';
 
         card.innerHTML = `
-            <img src="${imgUrl}" class="card-img" alt="${sp.popularNames[0]}" loading="lazy">
+            <img src="${imgUrl}" class="card-img" alt="${sp.popularNames[0]}" onerror="this.src='https://via.placeholder.com/400x250/2d6a4f/ffffff?text=Erro+ao+Carregar'">
             <div class="card-body">
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
+
                 <div class="traits-box">
                     <span><b>Família:</b> ${sp.family}</span>
-                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
                     <span><b>Hábito:</b> ${sp.type}</span>
+                    <span><b>Filotaxia:</b> ${sp.leafArrangement}</span>
                     <span><b>Folha:</b> ${sp.leafComposition}</span>
+                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
+                    <span><b>Exsudato:</b> ${sp.exudate}</span>
+                    <span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
                 </div>
-                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
+
+                <div class="special-features-box">
+                    <b>Destaque:</b> ${sp.specialFeatures}
+                </div>
+
+                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
             </div>
         `;
         grid.appendChild(card);
     });
 }
 
-// Lógica de exportação e modal permanecem as mesmas das versões v11/v12
-// (Certifique-se de manter as funções saveObservation e exportToCSV aqui)
-
+// Funções de salvamento e modal permanecem conforme configurado anteriormente
 init();

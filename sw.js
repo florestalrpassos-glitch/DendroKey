@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dendrokey-v13';
+const CACHE_NAME = 'dendrokey-v15';
 const ASSETS = [
     './',
     './index.html',
