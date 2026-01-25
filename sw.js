@@ -1,5 +1,5 @@
-// sw.js - DendroKey v11 (Suporte para 600 espécies)
-const CACHE_NAME = 'dendrokey-v11';
+// sw.js - DendroKey v12
+const CACHE_NAME = 'dendrokey-v12';
 const ASSETS = [
     './',
     './index.html',
