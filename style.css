@@ -1,44 +1,42 @@
-:root { --primary: #2d6a4f; --primary-dark: #1b4332; --bg: #f8f9fa; --accent: #d4a373; }
+:root { --primary: #2d6a4f; --primary-dark: #1b4332; --bg: #f4f4f4; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 body { background: var(--bg); padding-bottom: 80px; }
 
 header { background: var(--primary-dark); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-.reset-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; }
+.reset-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; }
 
-.search-input { width: calc(100% - 30px); margin: 15px; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; }
-.count-badge { font-size: 0.8rem; color: #666; font-weight: 600; margin-left: 5px; }
+.search-input { width: calc(100% - 30px); margin: 15px; padding: 15px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+.count-badge { font-size: 0.75rem; color: #555; font-weight: bold; margin-left: 5px; }
 
-.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; padding: 15px; }
-.card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #eee; }
+.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 12px; }
+.card { background: white; border-radius: 8px; border: 1px solid #ddd; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-.card-img { width: 100%; height: 180px; object-fit: cover; background-color: #f0f0f0; }
-.card-body { padding: 15px; }
-.pop-name { font-weight: 700; font-size: 1.1rem; color: var(--primary-dark); }
-.sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 10px; display: block; }
+.pop-name { font-weight: 700; font-size: 1rem; color: var(--primary-dark); }
+.sci-name { font-style: italic; color: #666; font-size: 0.85rem; margin-bottom: 10px; display: block; }
 
-.traits-box { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; padding: 10px; background: #f1f7f4; border-radius: 8px; font-size: 0.72rem; color: #2d6a4f; border: 1px solid #d1e2da; }
-.traits-box span { width: 48%; margin-bottom: 3px; }
+.traits-box { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; padding: 8px; background: #eef5f1; border-radius: 4px; font-size: 0.65rem; color: #2d6a4f; }
+.traits-box span { width: 48%; }
 
-.special-features-box { font-size: 0.75rem; color: #555; background: #fff9f0; padding: 10px; border-radius: 6px; border-left: 4px solid var(--accent); margin-bottom: 12px; }
+.special-features-box { font-size: 0.7rem; color: #444; background: #fffcf5; padding: 8px; border-left: 3px solid #d4a373; margin-bottom: 10px; }
 
-.btn-primary { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
-.btn-export { width: 100%; padding: 15px; background: #34495e; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
+.btn-export { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 6px; font-weight: bold; margin-bottom: 10px; }
 
-.fab { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; color: white; font-size: 1.5rem; z-index: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.fab { position: fixed; bottom: 90px; right: 20px; width: 50px; height: 50px; background: var(--primary); border-radius: 50%; border: none; color: white; font-size: 1.2rem; z-index: 500; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-.sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: white; z-index: 1100; transition: 0.3s; padding: 20px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+.sidebar { position: fixed; top: 0; right: -280px; width: 260px; height: 100%; background: white; z-index: 1100; transition: 0.3s; padding: 15px; overflow-y: auto; }
 .sidebar.open { right: 0; }
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1050; }
 .overlay.active { display: block; }
 
-.filter-btn { margin: 3px; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--primary); background: white; font-size: 0.75rem; }
+.filter-btn { margin: 2px; padding: 6px 10px; border-radius: 15px; border: 1px solid var(--primary); background: white; font-size: 0.7rem; }
 .filter-btn.active { background: var(--primary); color: white; }
 
-.main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 1000; height: 75px; }
-.nav-btn { flex: 1; border: none; background: none; font-weight: bold; color: #95a5a6; }
-.nav-btn.active { color: var(--primary); border-top: 5px solid var(--primary); }
+.main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 1000; height: 65px; }
+.nav-btn { flex: 1; border: none; background: none; font-weight: bold; color: #7f8c8d; font-size: 0.8rem; }
+.nav-btn.active { color: var(--primary); border-top: 4px solid var(--primary); }
 
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-content { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 15px; }
+.modal-content { background: white; padding: 20px; border-radius: 10px; width: 100%; max-width: 350px; }
 .hidden { display: none !important; }
-textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin: 10px 0; resize: none; }
+textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; }

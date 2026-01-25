@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DendroKey PRO</title>
+    <title>DendroKey LIGHT</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <header>
-        <div class="logo">🌿 <span>DendroKey PRO</span></div>
-        <button id="reset-btn" class="reset-btn">Limpar Tudo</button>
+        <div class="logo">🌿 <span>DendroKey</span></div>
+        <button id="reset-btn" class="reset-btn">Limpar</button>
     </header>
 
     <div id="filter-sidebar" class="sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>Filtros Botânicos</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Filtros</h3>
             <button id="close-filter" style="background:none; border:none; font-size:2rem;">&times;</button>
         </div>
+        <hr style="margin:10px 0;">
         <div id="filter-container"></div>
     </div>
     <div id="overlay" class="overlay"></div>
 
     <main>
         <div id="view-home" class="view-section">
-            <input type="text" id="search-input" placeholder="Nome popular ou científico..." class="search-input">
-            <div style="padding:0 15px;"><span id="count-badge" class="count-badge">Calculando espécies...</span></div>
+            <input type="text" id="search-input" placeholder="Buscar por nome popular ou científico..." class="search-input">
+            <div style="padding:0 15px;"><span id="count-badge" class="count-badge">Carregando espécies...</span></div>
             <div id="results-grid" class="species-grid"></div>
         </div>
 
@@ -41,18 +42,23 @@
 
     <nav class="main-nav">
         <button class="nav-btn active" data-target="home">Espécies</button>
-        <button class="nav-btn" data-target="collection">Meu Acervo</button>
+        <button class="nav-btn" data-target="collection">Caderno</button>
     </nav>
 
     <div id="add-modal" class="modal hidden">
         <div class="modal-content">
-            <h3 id="modal-species-name">Registrar Espécie</h3>
-            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange;">🛰️ Buscando sinal GPS...</p>
+            <h3 id="modal-species-name">Registrar</h3>
+            <p id="gps-status" style="font-size:0.7rem; margin:10px 0; color: orange;">🛰️ Buscando GPS...</p>
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
-                <input type="hidden" id="lat-input">
-                <input type="hidden" id="lng-input">
-                <textarea id="note-input" placeholder="Anotações de campo (DAP, Altura, Fenologia)..." rows="4"></textarea>
-                <button type="submit" class="btn-primary">Confirmar Registro</button>
+                <input type="hidden" id="lat-input"><input type="hidden" id="lng-input">
+                <textarea id="note-input" placeholder="Anotações (DAP, Altura, Fenologia)..." rows="4"></textarea>
+                <button type="submit" class="btn-primary">Salvar no Acervo</button>
             </form>
-            <button id="close-modal-btn" style="width:100%; background:none; border
+            <button id="close-modal-btn" style="width:100%; background:none; border:none; color:#e63946; margin-top:15px;">Cancelar</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
