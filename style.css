@@ -1,68 +1,44 @@
-:root {
-    --primary: #2d6a4f;
-    --primary-dark: #1b4332;
-    --bg: #f8f9fa;
-    --danger: #e63946;
-    --accent: #d4a373;
-}
-
+:root { --primary: #2d6a4f; --primary-dark: #1b4332; --bg: #f8f9fa; --accent: #d4a373; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-body { background: var(--bg); padding-bottom: 90px; }
+body { background: var(--bg); padding-bottom: 80px; }
 
 header { background: var(--primary-dark); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-.reset-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+.reset-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; }
 
-.search-input { width: calc(100% - 30px); margin: 15px; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.search-input { width: calc(100% - 30px); margin: 15px; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; }
+.count-badge { font-size: 0.8rem; color: #666; font-weight: 600; margin-left: 5px; }
 
-.fab { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; background: var(--primary); border-radius: 50%; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 500; display: flex; align-items: center; justify-content: center; }
-
-.sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: white; z-index: 1001; transition: 0.3s; padding: 20px; overflow-y: auto; }
-.sidebar.open { right: 0; }
-
-.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 15px; }
+.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; padding: 15px; }
 .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #eee; }
 
-.card-img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    background-color: #eee;
-}
+.card-img { width: 100%; height: 180px; object-fit: cover; background-color: #f0f0f0; }
+.card-body { padding: 15px; }
+.pop-name { font-weight: 700; font-size: 1.1rem; color: var(--primary-dark); }
+.sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 10px; display: block; }
 
-.card-body { padding: 12px; }
-.pop-name { font-weight: 700; font-size: 1.05rem; color: var(--primary-dark); }
-.sci-name { font-style: italic; color: #666; font-size: 0.85rem; margin-bottom: 8px; display: block; }
+.traits-box { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; padding: 10px; background: #f1f7f4; border-radius: 8px; font-size: 0.72rem; color: #2d6a4f; border: 1px solid #d1e2da; }
+.traits-box span { width: 48%; margin-bottom: 3px; }
 
-/* Caixa de Características Re-expandida */
-.traits-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin: 8px 0;
-    padding: 8px;
-    background: #f1f7f4;
-    border-radius: 8px;
-    font-size: 0.68rem;
-    color: #2d6a4f;
-    border: 1px solid #d1e2da;
-}
-.traits-box span { width: 48%; }
+.special-features-box { font-size: 0.75rem; color: #555; background: #fff9f0; padding: 10px; border-radius: 6px; border-left: 4px solid var(--accent); margin-bottom: 12px; }
 
-.special-features-box {
-    font-size: 0.72rem;
-    color: #555;
-    background: #fff9f0;
-    padding: 8px;
-    border-radius: 6px;
-    border-left: 3px solid var(--accent);
-    margin-bottom: 8px;
-}
+.btn-primary { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
+.btn-export { width: 100%; padding: 15px; background: #34495e; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px; }
 
-.btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; }
-.main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 100; height: 70px; }
-.nav-btn { flex: 1; padding: 10px; border: none; background: none; font-weight: bold; color: #95a5a6; cursor: pointer; }
-.nav-btn.active { color: var(--primary); border-top: 4px solid var(--primary); }
+.fab { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; color: white; font-size: 1.5rem; z-index: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-content { background: white; padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; }
+.sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: white; z-index: 1100; transition: 0.3s; padding: 20px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+.sidebar.open { right: 0; }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1050; }
+.overlay.active { display: block; }
+
+.filter-btn { margin: 3px; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--primary); background: white; font-size: 0.75rem; }
+.filter-btn.active { background: var(--primary); color: white; }
+
+.main-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; z-index: 1000; height: 75px; }
+.nav-btn { flex: 1; border: none; background: none; font-weight: bold; color: #95a5a6; }
+.nav-btn.active { color: var(--primary); border-top: 5px solid var(--primary); }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-content { background: white; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; }
 .hidden { display: none !important; }
+textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin: 10px 0; resize: none; }
