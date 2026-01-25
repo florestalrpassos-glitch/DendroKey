@@ -1,6 +1,5 @@
-// collection.js - Armazenamento Local IndexedDB
 export function initDB() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const request = indexedDB.open('DendroKeyDB', 1);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
@@ -9,7 +8,6 @@ export function initDB() {
             }
         };
         request.onsuccess = () => resolve();
-        request.onerror = () => reject();
     });
 }
 
@@ -31,8 +29,7 @@ export function getAllObservations() {
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readonly');
-            const store = tx.objectStore('observations');
-            store.getAll().onsuccess = (ev) => resolve(ev.target.result);
+            tx.objectStore('observations').getAll().onsuccess = (ev) => resolve(ev.target.result);
         };
     });
 }
