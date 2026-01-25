@@ -4,11 +4,10 @@ import { speciesDataPart3 as part3 } from './db_part3.js';
 import { speciesDataPart4 as part4 } from './db_part4.js';
 import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
-// Unifica as 600 espécies
 const speciesData = [...part1, ...part2, ...part3, ...part4];
 
 let activeFilters = {
-    type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [], flowerColor: []
+    type: [], leafArrangement: [], leafComposition: [], flowerColor: [], exudate: [], spines: []
 };
 
 async function init() {
@@ -22,10 +21,10 @@ function renderFilters() {
     const container = document.getElementById('filter-container');
     const filterConfig = [
         { key: 'type', label: 'Hábito' },
+        { key: 'flowerColor', label: 'Cor da Flor' },
         { key: 'leafArrangement', label: 'Filotaxia' },
         { key: 'leafComposition', label: 'Tipo de Folha' },
         { key: 'exudate', label: 'Exsudato' },
-        { key: 'flowerColor', label: 'Cor da Flor' }, // NOVO FILTRO
         { key: 'spines', label: 'Espinhos' }
     ];
 
@@ -58,18 +57,14 @@ function renderFilters() {
 }
 
 function applyFilters() {
-    const searchInput = document.getElementById('search-input');
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
     const filtered = speciesData.filter(sp => {
         const matchesText = sp.scientificName.toLowerCase().includes(query) ||
                             sp.popularNames.some(p => p.toLowerCase().includes(query));
-
         const matchesFilters = Object.keys(activeFilters).every(key => {
             if (activeFilters[key].length === 0) return true;
             return activeFilters[key].includes(sp[key]);
         });
-
         return matchesText && matchesFilters;
     });
     renderSpecies(filtered);
@@ -77,7 +72,7 @@ function applyFilters() {
 
 function renderSpecies(list) {
     const grid = document.getElementById('results-grid');
-    document.getElementById('count-badge').textContent = `${list.length} espécies filtradas`;
+    document.getElementById('count-badge').textContent = `${list.length} espécies encontradas`;
     grid.innerHTML = '';
     list.forEach(sp => {
         const card = document.createElement('div');
@@ -89,9 +84,9 @@ function renderSpecies(list) {
 
                 <div class="traits-box">
                     <span><b>Família:</b> ${sp.family}</span>
+                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
                     <span><b>Hábito:</b> ${sp.type}</span>
                     <span><b>Folha:</b> ${sp.leafComposition}</span>
-                    <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
                     <span><b>Exsudato:</b> ${sp.exudate}</span>
                     <span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
                 </div>
@@ -100,7 +95,7 @@ function renderSpecies(list) {
                     <b>Destaque:</b> ${sp.specialFeatures}
                 </div>
 
-                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar Encontro</button>
+                <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
             </div>
         `;
         grid.appendChild(card);
@@ -119,7 +114,7 @@ async function exportToCSV() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Inventario_DendroKey_${new Date().getTime()}.csv`;
+    link.download = `Relatorio_DendroKey_${new Date().getTime()}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -130,7 +125,7 @@ async function renderCollection() {
     const observations = await getAllObservations();
     grid.innerHTML = '';
     if (observations.length === 0) {
-        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Caderno vazio.</p>';
+        grid.innerHTML = '<p style="padding:40px; text-align:center; color:#999;">Acervo vazio.</p>';
         return;
     }
     observations.forEach(obs => {
@@ -154,7 +149,7 @@ async function renderCollection() {
                     <span><b>Família:</b> ${info.family}</span>
                     <span><b>Hábito:</b> ${info.type}</span>
                     <span><b>Flor:</b> ${info.flowerColor || 'N/A'}</span>
-                    <span><b>Folha:</b> ${info.leafComposition}</span>
+                    <span><b>Exsudato:</b> ${info.exudate}</span>
                     <span><b>ID:</b> #${obs.speciesId}</span>
                 </div>
                 <div class="note-box">${obs.note || 'Sem anotações.'}</div>
@@ -172,17 +167,21 @@ function setupEventListeners() {
     const fab = document.getElementById('fab-filter');
     const sidebar = document.getElementById('filter-sidebar');
     const overlay = document.getElementById('overlay');
+
     fab.onclick = () => { sidebar.classList.add('open'); overlay.classList.add('active'); };
     overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
     document.getElementById('close-filter').onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
+
     document.getElementById('search-input').addEventListener('input', applyFilters);
     document.getElementById('btn-export').onclick = exportToCSV;
+
     document.getElementById('reset-btn').onclick = () => {
-        activeFilters = { type: [], leafArrangement: [], leafComposition: [], leafMargin: [], exudate: [], spines: [], flowerColor: [] };
+        activeFilters = { type: [], leafArrangement: [], leafComposition: [], flowerColor: [], exudate: [], spines: [] };
         document.getElementById('search-input').value = '';
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         applyFilters();
     };
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -192,6 +191,7 @@ function setupEventListeners() {
             if (btn.dataset.target === 'collection') renderCollection();
         };
     });
+
     document.getElementById('add-form').onsubmit = async (e) => {
         e.preventDefault();
         const id = document.getElementById('modal-species-id').value;
@@ -204,10 +204,7 @@ function setupEventListeners() {
         });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Registro salvo!');
-    };
-    document.getElementById('photo-input').onchange = (e) => {
-        document.getElementById('photo-preview-text').textContent = e.target.files.length > 0 ? "✅ Foto Capturada" : "Nenhuma foto";
+        alert('Salvo!');
     };
 }
 

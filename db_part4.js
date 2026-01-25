@@ -1,4 +1,4 @@
-// db_part4.js - Espécies 501 a 600 para DendroKey
+// db_part4.js - Expansão para 600 espécies
 export const speciesDataPart4 = [
   {
     "id": "501",
@@ -12,11 +12,86 @@ export const speciesDataPart4 = [
     "exudate": "Ausente",
     "spines": false,
     "flowerColor": "Branca/Roxa",
-    "specialFeatures": "Flores mudam de cor de branco para roxo com o tempo.",
-    "description": "Mata Atlântica e ornamental."
+    "specialFeatures": "Flores mudam de cor conforme a maturação.",
+    "description": "Espécie ornamental da Mata Atlântica."
   },
   {
     "id": "502",
+    "scientificName": "Handroanthus albus",
+    "popularNames": ["Ipê-amarelo-da-serra"],
+    "family": "Bignoniaceae",
+    "type": "Árvore",
+    "leafArrangement": "Oposta",
+    "leafComposition": "Composta Digitada",
+    "leafMargin": "Serreada",
+    "exudate": "Ausente",
+    "spines": false,
+    "flowerColor": "Amarela",
+    "specialFeatures": "Folhas com pilosidade densa e flores amarelas vibrantes.",
+    "description": "Muito comum em áreas de altitude."
+  },
+  {
+    "id": "503",
+    "scientificName": "Erythrina crista-galli",
+    "popularNames": ["Corticeira-do-banhado"],
+    "family": "Fabaceae",
+    "type": "Árvore",
+    "leafArrangement": "Alterna",
+    "leafComposition": "Composta Trifoliolada",
+    "leafMargin": "Inteira",
+    "exudate": "Ausente",
+    "spines": true,
+    "flowerColor": "Vermelha",
+    "specialFeatures": "Presença de acúleos no pecíolo e ramos.",
+    "description": "Típica de solos encharcados."
+  },
+  {
+    "id": "504",
+    "scientificName": "Bauhinia variegata",
+    "popularNames": ["Pata-de-vaca-lilás"],
+    "family": "Fabaceae",
+    "type": "Árvore",
+    "leafArrangement": "Alterna",
+    "leafComposition": "Simples",
+    "leafMargin": "Inteira",
+    "exudate": "Ausente",
+    "spines": false,
+    "flowerColor": "Lilás",
+    "specialFeatures": "Folha bilobada característica do gênero.",
+    "description": "Ampla utilização urbana."
+  },
+  {
+    "id": "505",
+    "scientificName": "Calliandra harrisii",
+    "popularNames": ["Esponjinha-vermelha"],
+    "family": "Fabaceae",
+    "type": "Arbusto",
+    "leafArrangement": "Alterna",
+    "leafComposition": "Composta Bipinada",
+    "leafMargin": "Inteira",
+    "exudate": "Ausente",
+    "spines": false,
+    "flowerColor": "Vermelha",
+    "specialFeatures": "Estames longos e vermelhos em forma de pompom.",
+    "description": "Cerrado e áreas abertas."
+  },
+  {
+    "id": "506",
+    "scientificName": "Allamanda cathartica",
+    "popularNames": ["Alamanda-amarela"],
+    "family": "Apocynaceae",
+    "type": "Liana",
+    "leafArrangement": "Verticilada",
+    "leafComposition": "Simples",
+    "leafMargin": "Inteira",
+    "exudate": "Branco (Látex)",
+    "spines": false,
+    "flowerColor": "Amarela",
+    "specialFeatures": "Látex abundante e tóxico.",
+    "description": "Trepadeira vigorosa."
+  },
+  {
+    "id": "507",
     "scientificName": "Buchenavia tetraphylla",
     "popularNames": ["Mirindiba"],
     "family": "Combretaceae",
@@ -26,24 +101,45 @@ export const speciesDataPart4 = [
     "leafMargin": "Inteira",
     "exudate": "Ausente",
     "spines": false,
-    "flowerColor": "Verde/Amarela",
-    "specialFeatures": "Folhas aglomeradas no ápice dos ramos.",
-    "description": "Mata alta."
+    "flowerColor": "Verde",
+    "specialFeatures": "Folhas obovadas aglomeradas no ápice.",
+    "description": "Mata Atlântica."
   },
-  // ... (Preencha seguindo este padrão para manter a integridade do banco)
   {
-    "id": "600",
-    "scientificName": "Qualea dichotoma",
-    "popularNames": ["Pau-terra-liso"],
-    "family": "Vochysiaceae",
+    "id": "508",
+    "scientificName": "Tabebuia roseoalba",
+    "popularNames": ["Ipê-branco"],
+    "family": "Bignoniaceae",
     "type": "Árvore",
     "leafArrangement": "Oposta",
-    "leafComposition": "Simples",
+    "leafComposition": "Composta Digitada",
     "leafMargin": "Inteira",
     "exudate": "Ausente",
     "spines": false,
     "flowerColor": "Branca",
-    "specialFeatures": "Tronco liso esverdeado, flores perfumadas.",
-    "description": "Cerradão."
-  }
-];
+    "specialFeatures": "Floração curta e intensa no inverno.",
+    "description": "Decídua."
+  },
+  {
+    "id": "509",
+    "scientificName": "Senna alata",
+    "popularNames": ["Mangerioba-do-pará"],
+    "family": "Fabaceae",
+    "type": "Arbusto",
+    "leafArrangement": "Alterna",
+    "leafComposition": "Composta Paripinada",
+    "leafMargin": "Inteira",
+    "exudate": "Ausente",
+    "spines": false,
+    "flowerColor": "Amarela",
+    "specialFeatures": "Inflorescência em espiga ereta.",
+    "description": "Medicinal."
+  },
+  {
+    "id": "510",
+    "scientificName": "Pachira aquatica",
+    "popularNames": ["Munguba"],
+    "family": "Malvaceae",
+    "type": "Árvore",
+    "leafArrangement": "Alterna",
+    "leafComposition": "Composta Digitada",
