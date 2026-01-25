@@ -4,6 +4,7 @@ import { speciesDataPart3 as part3 } from './db_part3.js';
 import { speciesDataPart4 as part4 } from './db_part4.js';
 import { initDB, saveObservation, getAllObservations, deleteObservation } from './collection.js';
 
+// Unifica as 600 espécies
 const speciesData = [...part1, ...part2, ...part3, ...part4];
 
 let activeFilters = {
@@ -81,7 +82,6 @@ function renderSpecies(list) {
             <div class="card-body">
                 <div class="pop-name">${sp.popularNames[0]}</div>
                 <div class="sci-name">${sp.scientificName}</div>
-
                 <div class="traits-box">
                     <span><b>Família:</b> ${sp.family}</span>
                     <span><b>Flor:</b> ${sp.flowerColor || 'N/A'}</span>
@@ -90,11 +90,7 @@ function renderSpecies(list) {
                     <span><b>Exsudato:</b> ${sp.exudate}</span>
                     <span><b>Espinhos:</b> ${sp.spines ? 'Sim' : 'Não'}</span>
                 </div>
-
-                <div class="special-features-box">
-                    <b>Destaque:</b> ${sp.specialFeatures}
-                </div>
-
+                <div class="special-features-box"><b>Destaque:</b> ${sp.specialFeatures}</div>
                 <button class="btn-primary" onclick="window.openModal('${sp.id}')">📷 Registrar</button>
             </div>
         `;
@@ -114,7 +110,7 @@ async function exportToCSV() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Relatorio_DendroKey_${new Date().getTime()}.csv`;
+    link.download = `Inventario_DendroKey_${new Date().getTime()}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -149,7 +145,6 @@ async function renderCollection() {
                     <span><b>Família:</b> ${info.family}</span>
                     <span><b>Hábito:</b> ${info.type}</span>
                     <span><b>Flor:</b> ${info.flowerColor || 'N/A'}</span>
-                    <span><b>Exsudato:</b> ${info.exudate}</span>
                     <span><b>ID:</b> #${obs.speciesId}</span>
                 </div>
                 <div class="note-box">${obs.note || 'Sem anotações.'}</div>
@@ -167,21 +162,17 @@ function setupEventListeners() {
     const fab = document.getElementById('fab-filter');
     const sidebar = document.getElementById('filter-sidebar');
     const overlay = document.getElementById('overlay');
-
     fab.onclick = () => { sidebar.classList.add('open'); overlay.classList.add('active'); };
     overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
     document.getElementById('close-filter').onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); };
-
     document.getElementById('search-input').addEventListener('input', applyFilters);
     document.getElementById('btn-export').onclick = exportToCSV;
-
     document.getElementById('reset-btn').onclick = () => {
         activeFilters = { type: [], leafArrangement: [], leafComposition: [], flowerColor: [], exudate: [], spines: [] };
         document.getElementById('search-input').value = '';
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         applyFilters();
     };
-
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -191,7 +182,6 @@ function setupEventListeners() {
             if (btn.dataset.target === 'collection') renderCollection();
         };
     });
-
     document.getElementById('add-form').onsubmit = async (e) => {
         e.preventDefault();
         const id = document.getElementById('modal-species-id').value;
@@ -204,7 +194,7 @@ function setupEventListeners() {
         });
         document.getElementById('add-modal').classList.add('hidden');
         document.getElementById('add-form').reset();
-        alert('Salvo!');
+        alert('Registro salvo!');
     };
 }
 
