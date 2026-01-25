@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DendroKey PRO v27</title>
+    <title>DendroKey PRO v28</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <header>
         <div class="logo">🌿 <span>DendroKey PRO</span></div>
-        <button onclick="location.reload()" class="reset-btn">Recarregar</button>
+        <button onclick="location.reload()" class="reset-btn">🔄 Atualizar</button>
     </header>
 
     <div id="filter-sidebar" class="sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Filtros de Campo</h3>
-            <button id="close-filter" style="background:none; border:none; font-size:2.5rem; padding:10px;">&times;</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h3>Chaves Botânicas</h3>
+            <button id="close-filter" style="background:none; border:none; font-size:2.5rem; color:red;">&times;</button>
         </div>
         <div id="filter-container"></div>
     </div>
@@ -31,7 +31,7 @@
 
         <div id="view-collection" class="view-section hidden">
             <div style="padding:15px;">
-                <button id="btn-export" class="btn-export">📊 Gerar Relatório CSV</button>
+                <button id="btn-export" class="btn-export">📊 Exportar Inventário (CSV)</button>
             </div>
             <div id="collection-grid" class="species-grid"></div>
         </div>
@@ -47,7 +47,7 @@
     <div id="add-modal" class="modal hidden">
         <div class="modal-content">
             <h3 id="modal-species-name">Registrar</h3>
-            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ Aguardando GPS...</p>
+            <p id="gps-status" style="font-size:0.75rem; margin:10px 0; color: orange; font-weight: bold;">🛰️ GPS aguardando sinal...</p>
 
             <form id="add-form">
                 <input type="hidden" id="modal-species-id">
@@ -55,12 +55,12 @@
                 <input type="hidden" id="lng-input">
 
                 <label class="camera-label">
-                    📷 TIRAR FOTO DA ÁRVORE
+                    📷 TIRAR FOTO EM CAMPO
                     <input type="file" id="photo-input" accept="image/*" capture="camera">
                 </label>
                 <div id="photo-feedback" class="hidden" style="color:green; font-weight:bold; font-size:0.8rem; text-align:center; margin-bottom:15px;">✅ Foto Pronta!</div>
 
-                <textarea id="note-input" placeholder="DAP, Altura, Fenologia, Ponto..." rows="4"></textarea>
+                <textarea id="note-input" placeholder="Notas: DAP, Altura, Fenologia, Ponto de Vistoria..." rows="4"></textarea>
                 <button type="submit" id="save-obs-btn" class="btn-primary">SALVAR REGISTRO</button>
             </form>
             <button onclick="window.closeRegModal()" style="width:100%; background:none; border:none; color:red; margin-top:20px; font-weight:bold; cursor:pointer;">Cancelar</button>

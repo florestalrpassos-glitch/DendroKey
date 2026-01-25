@@ -1,6 +1,7 @@
+// collection.js - Versão 3 (Auto-Reparo de Esquema)
 export function initDB() {
-    return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 2);
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('DendroKeyDB', 3);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
             if (!db.objectStoreNames.contains('observations')) {
@@ -8,24 +9,27 @@ export function initDB() {
             }
         };
         request.onsuccess = () => resolve();
+        request.onerror = (err) => reject(err);
     });
 }
 
 export function saveObservation(data) {
-    return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 2);
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('DendroKeyDB', 3);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readwrite');
-            tx.objectStore('observations').add(data);
-            tx.oncomplete = () => resolve();
+            const store = tx.objectStore('observations');
+            const addReq = store.add(data);
+            addReq.onsuccess = () => resolve();
+            addReq.onerror = (err) => reject(err);
         };
     });
 }
 
 export function getAllObservations() {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 2);
+        const request = indexedDB.open('DendroKeyDB', 3);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readonly');
@@ -36,7 +40,7 @@ export function getAllObservations() {
 
 export function deleteObservation(id) {
     return new Promise((resolve) => {
-        const request = indexedDB.open('DendroKeyDB', 2);
+        const request = indexedDB.open('DendroKeyDB', 3);
         request.onsuccess = (e) => {
             const db = e.target.result;
             const tx = db.transaction('observations', 'readwrite');
