@@ -7,24 +7,15 @@ import { initDB, saveObservation, getAllObservations, deleteObservation } from '
 const speciesData = [...p1, ...p2, ...p3, ...p4];
 let filters = { type: [], flowerColor: [], leafArrangement: [], leafComposition: [], exudate: [], spines: [] };
 
-// Função de conversão Lat/Long para UTM (WGS84) - Fuso 23S para Tiros/MG
 function toUTM(lat, lon) {
-    const a = 6378137;
-    const f = 1 / 298.257223563;
-    const k0 = 0.9996;
-    const lon0 = -45 * Math.PI / 180; // Meridiano Central Fuso 23
-    const latRad = lat * Math.PI / 180;
-    const lonRad = lon * Math.PI / 180;
-    const e2 = 2 * f - f * f;
-    const ep2 = e2 / (1 - e2);
-    const N = a / Math.sqrt(1 - e2 * Math.sin(latRad) ** 2);
-    const T = Math.tan(latRad) ** 2;
-    const C = ep2 * Math.cos(latRad) ** 2;
-    const A = (lonRad - lon0) * Math.cos(latRad);
-    const M = a * ((1 - e2 / 4 - 3 * e2 ** 2 / 64 - 5 * e2 ** 3 / 256) * latRad - (3 * e2 / 8 + 3 * e2 ** 2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * latRad) + (15 * e2 ** 2 / 256 + 45 * e2 ** 3 / 1024) * Math.sin(4 * latRad) - (35 * e2 ** 3 / 3072) * Math.sin(6 * latRad));
-    const easting = k0 * N * (A + (1 - T + C) * A ** 3 / 6 + (5 - 18 * T + T ** 2 + 72 * C - 58 * ep2) * A ** 5 / 120) + 500000;
-    const northing = k0 * (M + N * Math.tan(latRad) * (A ** 2 / 2 + (5 - T + 9 * C + 4 * C ** 2) * A ** 4 / 24 + (61 - 58 * T + T ** 2 + 600 * C - 330 * ep2) * A ** 6 / 720)) + 10000000;
-    return { east: easting.toFixed(2), north: northing.toFixed(2) };
+    const a = 6378137, f = 1 / 298.257223563, k0 = 0.9996, lon0 = -45 * Math.PI / 180;
+    const latRad = lat * Math.PI / 180, lonRad = lon * Math.PI / 180;
+    const e2 = 2 * f - f * f, ep2 = e2 / (1 - e2), N = a / Math.sqrt(1 - e2 * Math.sin(latRad) ** 2);
+    const T = Math.tan(latRad) ** 2, C = ep2 * Math.cos(latRad) ** 2, A = (lonRad - lon0) * Math.cos(latRad);
+    const M = a * ((1 - e2 / 4 - 3 * e2 ** 2 / 64 - 5 * e2 ** 3 / 256) * latRad - (3 * e2 / 8 + 3 * e2 ** 2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * latRad) + (15 * e2 / 256 + 45 * e2 ** 2 / 1024) * Math.sin(4 * latRad) - (35 * e2 ** 3 / 3072) * Math.sin(6 * latRad));
+    const east = k0 * N * (A + (1 - T + C) * A ** 3 / 6 + (5 - 18 * T + T ** 2 + 72 * C - 58 * ep2) * A ** 5 / 120) + 500000;
+    const north = k0 * (M + N * Math.tan(latRad) * (A ** 2 / 2 + (5 - T + 9 * C + 4 * C ** 2) * A ** 4 / 24 + (61 - 58 * T + T ** 2 + 600 * C - 330 * ep2) * A ** 6 / 720)) + 10000000;
+    return { e: east.toFixed(2), n: north.toFixed(2) };
 }
 
 async function start() {
@@ -80,7 +71,6 @@ function renderSpecies(list) {
             <div class="sci-name">${s.scientificName}</div>
             <div class="traits-box">
                 <span><b>Família:</b> ${s.family}</span><span><b>Hábito:</b> ${s.type}</span>
-                <span><b>Filotaxia:</b> ${s.leafArrangement}</span><span><b>Exsudato:</b> ${s.exudate}</span>
             </div>
             <button class="btn-primary" onclick="window.openRegModal('${s.id}')">📷 Registrar</button>
         `;
@@ -94,6 +84,13 @@ function setupEvents() {
     document.getElementById('search-input').oninput = applyFilters;
     document.getElementById('btn-export').onclick = exportToCSV;
     document.getElementById('photo-input').onchange = (e) => { if(e.target.files.length > 0) document.getElementById('photo-feedback').classList.remove('hidden'); };
+
+    document.getElementById('btn-clear-filters').onclick = () => {
+        filters = { type: [], flowerColor: [], leafArrangement: [], leafComposition: [], exudate: [], spines: [] };
+        document.getElementById('search-input').value = '';
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        applyFilters();
+    };
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.onclick = () => {
@@ -109,10 +106,13 @@ function setupEvents() {
         e.preventDefault();
         const id = document.getElementById('modal-species-id').value;
         const sp = speciesData.find(x => x.id === id);
+
         await saveObservation({
             speciesId: id, speciesName: sp.popularNames[0], scientificName: sp.scientificName,
             photo: document.getElementById('photo-input').files[0] || null,
             note: document.getElementById('note-input').value,
+            dap: document.getElementById('dap-input').value || "0",
+            h: document.getElementById('h-input').value || "0",
             lat: document.getElementById('lat-input').value, lng: document.getElementById('lng-input').value,
             utmE: document.getElementById('utm-e-input').value, utmN: document.getElementById('utm-n-input').value,
             timestamp: Date.now()
@@ -123,22 +123,21 @@ function setupEvents() {
 
 window.openRegModal = (id) => {
     const s = speciesData.find(x => x.id === id);
-    const gps = document.getElementById('gps-status');
     document.getElementById('add-form').reset();
     document.getElementById('photo-feedback').classList.add('hidden');
     document.getElementById('modal-species-id').value = id;
     document.getElementById('modal-species-name').textContent = s.popularNames[0];
     document.getElementById('add-modal').classList.remove('hidden');
-    gps.textContent = "🛰️ Buscando UTM...";
+    const gps = document.getElementById('gps-status');
+    gps.textContent = "🛰️ Buscando UTM..."; gps.style.color = "orange";
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
             const utm = toUTM(pos.coords.latitude, pos.coords.longitude);
             document.getElementById('lat-input').value = pos.coords.latitude;
             document.getElementById('lng-input').value = pos.coords.longitude;
-            document.getElementById('utm-e-input').value = utm.east;
-            document.getElementById('utm-n-input').value = utm.north;
-            gps.textContent = `✅ UTM: E ${utm.east} | N ${utm.north}`;
-            gps.style.color = "green";
+            document.getElementById('utm-e-input').value = utm.e;
+            document.getElementById('utm-n-input').value = utm.n;
+            gps.textContent = `✅ UTM: E ${utm.e} | N ${utm.n}`; gps.style.color = "green";
         }, null, {enableHighAccuracy: true});
     }
 };
@@ -153,34 +152,28 @@ async function renderCollection() {
         const info = speciesData.find(s => s.id === o.speciesId);
         const card = document.createElement('div');
         card.className = 'card';
-        let img = o.photo ? `<img src="${URL.createObjectURL(o.photo)}">` : '<div style="background:#eee; height:150px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">Sem Foto</div>';
+        let img = o.photo ? `<img src="${URL.createObjectURL(o.photo)}">` : '<div style="background:#eee; height:100px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">Sem Foto</div>';
         card.innerHTML = `
             ${img}
-            <div style="display:flex; justify-content:space-between; align-items:start;">
-                <div><b>${o.speciesName}</b><br><small>${o.scientificName}</small></div>
-                <button onclick="window.deleteItem(${o.id})" style="border:none; background:none; color:red; font-size:1.8rem; cursor:pointer;">&times;</button>
-            </div>
+            <b>${o.speciesName}</b><br><small>${o.scientificName}</small>
             <div class="traits-box" style="background:#f9f9f9; color:#444;">
-                <span><b>Família:</b> ${info.family}</span><span><b>Hábito:</b> ${info.type}</span>
-                <span><b>Arranjo:</b> ${info.leafArrangement}</span><span><b>Látex:</b> ${info.exudate}</span>
+                <span><b>DAP:</b> ${o.dap}cm</span><span><b>H:</b> ${o.h}m</span>
+                <span><b>UTM E:</b> ${o.utmE}</span><span><b>UTM N:</b> ${o.utmN}</span>
             </div>
-            <p style="font-size:0.85rem; color:#333; margin:10px 0; border-left:3px solid var(--primary); padding-left:10px;">${o.note}</p>
-            <p style="font-size:0.65rem; color:#999; font-weight:bold;">📍 UTM E: ${o.utmE} | N: ${o.utmN} | Zone 23S</p>
+            <p style="font-size:0.8rem; color:#333; margin:5px 0;">${o.note}</p>
         `;
         grid.appendChild(card);
     });
 }
 
-window.deleteItem = async (id) => { if(confirm("Apagar registro?")) { await deleteObservation(id); renderCollection(); } };
-
 async function exportToCSV() {
     const data = await getAllObservations();
-    let csv = "\uFEFFID;Popular;Cientifico;UTM_E;UTM_N;Notas;Data\n";
-    data.forEach(o => { csv += `${o.speciesId};${o.speciesName};${o.scientificName};${o.utmE};${o.utmN};${o.note.replace(/;/g,',')};${new Date(o.timestamp).toLocaleString()}\n`; });
+    let csv = "\uFEFFID;Popular;Cientifico;DAP_cm;H_m;UTM_E;UTM_N;Notas;Data\n";
+    data.forEach(o => { csv += `${o.speciesId};${o.speciesName};${o.scientificName};${o.dap};${o.h};${o.utmE};${o.utmN};${o.note.replace(/;/g,',')};${new Date(o.timestamp).toLocaleString()}\n`; });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "Inventario_DendroKey_UTM.csv";
+    link.download = "Inventario_DendroKey.csv";
     link.click();
 }
 
